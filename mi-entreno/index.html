@@ -155,6 +155,16 @@ select.inp{appearance:auto}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
 .tog.on .sw{background:var(--ok)}.tog.on .sw::after{left:23px}
 .lib-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 8px;cursor:pointer;min-height:52px}
+.lib-row{display:flex;gap:8px;align-items:stretch;margin:0 0 8px}
+.lib-row .lib-item{margin:0}
+.lib-row .q{min-width:52px;font-size:20px;font-weight:800;color:var(--ac)}
+.guide{background:var(--s2);border-radius:12px;padding:4px 14px 12px;margin:6px 0 10px}
+.sheet .guide{background:transparent;padding:0}
+.guide h4{font-size:15px;margin:14px 0 6px;color:var(--ac)}
+ol.howto{margin:0;padding:0;list-style:none;counter-reset:st}
+ol.howto li{counter-increment:st;position:relative;padding:0 0 10px 36px;font-size:15.5px;line-height:1.45}
+ol.howto li::before{content:counter(st);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--ac2);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.btn.vid{background:#3a1416;border-color:#7a2d2d;color:#fff;margin-top:12px}
 .list-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
 .list-row:first-of-type{border-top:0}
 /* charts */
@@ -253,6 +263,203 @@ const BASE_EX = [
   ['plank','Plancha','Core','t','ok','20-60','Sobre antebrazos. Si molesta el hombro, apoya las rodillas.'],
   ['knee_raise','Elevación de rodillas colgado','Core','bw','care','6-12','Requiere colgarse: solo si el colgado no duele.'],
 ].map(([id, name, group, type, shoulder, goal, tip]) => ({ id, name, group, type, shoulder, goal, tip }));
+
+/* Guía "Cómo se hace": pasos, errores comunes, cuidado del hombro y un video verificado. */
+const YT = (id, title, channel) => ({ url: 'https://www.youtube.com/watch?v=' + id, title, channel });
+const GUIDE = {
+  rot_ext: {
+    steps: ['Acuéstate de lado sobre el brazo sano, con la cabeza apoyada en ese brazo o en un cojín.',
+      'Pon una toalla doblada entre el codo de arriba y tus costillas. Dobla ese codo en 90°: el antebrazo queda cruzado sobre el abdomen, con la mancuerna en la mano.',
+      'Sin despegar el codo de la toalla, gira el antebrazo hacia arriba, como una puerta que se abre. Sube solo hasta donde no duela.',
+      'Baja lento, en 2-3 segundos. Termina las reps y cambia de lado.'],
+    errors: ['Despegar el codo de la toalla.', 'Echar el cuerpo hacia atrás para ayudarte.', 'Usar mucho peso: con 1-2 kg (o sin peso) basta.'],
+    shoulder: 'Es un ejercicio de rehabilitación: tiene que sentirse suave. Si duele, achica el recorrido o hazlo sin peso.',
+    video: YT('Axu0GxqDxzM', 'Rotación externa completa de hombro en decúbito lateral', 'Cirugía de Hombro y Codo - Guido Fierro MD') },
+  scap_pull: {
+    steps: ['Cuélgate de la barra con las manos al ancho de los hombros y los brazos estirados. Si te cuesta, deja los pies apoyados en el suelo o en una silla para quitar peso.',
+      'Sin doblar los codos, baja los hombros (aléjalos de las orejas) y junta las escápulas atrás. Tu cuerpo sube solo unos pocos centímetros.',
+      'Mantén 1 segundo arriba.',
+      'Vuelve lento a quedar colgado. Es un movimiento corto: solo se mueven los omóplatos.'],
+    errors: ['Doblar los codos (eso ya es una dominada).', 'Encoger los hombros hacia las orejas.', 'Balancearte.'],
+    shoulder: 'Si colgarte molesta, apoya más peso en los pies.',
+    video: YT('QXZ5vZrjApY', 'Como hacer la retracción y depresión escapular en barra', 'Kranos Calistenia') },
+  ytw: {
+    steps: ['Acuéstate boca abajo en el suelo o en la cama, con la frente apoyada en una toalla.',
+      'Y: estira los brazos hacia adelante en diagonal, formando una Y, con los pulgares hacia el techo. Levántalos unos centímetros, pausa 1 s y baja.',
+      'T: abre los brazos hacia los lados, formando una T, con los pulgares arriba. Levanta, pausa y baja.',
+      'W: dobla los codos y acércalos a las costillas, con las manos a la altura de los hombros (forma de W). Junta las escápulas levantando codos y manos.',
+      'Cada letra cuenta como 1 rep. Todo lento.'],
+    errors: ['Levantar la cabeza o arquear la espalda baja.', 'Hacerlo rápido o con impulso.', 'Encoger los hombros.'],
+    shoulder: 'Sin peso o con 1 kg. Si una letra molesta, súbela menos o sáltatela.',
+    video: YT('zCQrWhfGppk', 'Ejercicio YTW: estabilidad escapular', 'Glory Sport Physio') },
+  wall_slide: {
+    steps: ['Párate de frente a la pared, a un paso de distancia.',
+      'Apoya los antebrazos en la pared, paralelos, con los codos a la altura de los hombros.',
+      'Desliza los antebrazos hacia arriba por la pared, abriéndolos un poco en forma de V, sin despegarlos.',
+      'Sube solo hasta donde no duela y vuelve lento a la posición inicial.'],
+    errors: ['Encoger los hombros hacia las orejas.', 'Arquear la espalda baja.', 'Forzar el rango para llegar más arriba.'],
+    shoulder: 'Usa una toalla bajo los antebrazos si se traban. El rango irá mejorando con las semanas.',
+    video: YT('Cw-cgyYtz1k', 'Wall slides (español)', 'FlofitnessPR') },
+  dead_hang: {
+    steps: ['Ponte bajo la barra. Si está baja o usas una silla, deja los pies apoyados.',
+      'Toma la barra con las palmas hacia adelante, al ancho de los hombros.',
+      'Doblando las rodillas, deja caer parte de tu peso. Al principio, los pies siguen apoyados para descargar.',
+      'Hombros activos: un poco alejados de las orejas, sin quedar colgando flojo. Respira tranquilo.',
+      'Aguanta el tiempo meta y bájate con control.'],
+    errors: ['Colgar flojo, con los hombros pegados a las orejas.', 'Soltarte de golpe.', 'Quitar el apoyo de los pies antes de tiempo.'],
+    shoulder: 'Si duele en la parte alta del hombro, carga más peso en los pies o detente.',
+    video: YT('WUY-S2jaghc', '"Active" dead hang: técnica en barra (en inglés)', 'TheLeanBerets') },
+  pullup: {
+    steps: ['Toma la barra con las palmas hacia adelante, con las manos al ancho de los hombros.',
+      'Parte colgado con los brazos estirados y los hombros activos (escápulas abajo).',
+      'Sube llevando el pecho hacia la barra y los codos hacia las costillas, hasta que la barbilla pase la barra.',
+      'Baja lento, en 2-3 s, hasta estirar los brazos.'],
+    errors: ['Balancearte o patear para subir.', 'Hacer medias repeticiones.', 'Encoger los hombros.'],
+    shoulder: 'Si molesta, cambia a dominadas supinas (palmas hacia ti), que suelen ser más amables con el hombro.',
+    video: YT('pT9ZCIeJhEM', 'Cómo hacer dominadas pronadas (pull ups)', 'Your House Fitness') },
+  chinup: {
+    steps: ['Toma la barra con las palmas hacia ti y las manos al ancho de los hombros.',
+      'Parte colgado con los brazos estirados y los hombros activos.',
+      'Sube llevando los codos hacia las costillas hasta que la barbilla pase la barra.',
+      'Baja lento, en 2-3 s, hasta estirar los brazos.'],
+    errors: ['Balancearte.', 'Quedarte a medio camino al bajar.', 'Estirar el cuello para "pasar" la barbilla.'],
+    shoulder: 'Si aún no salen completas o molestan, vuelve a las negativas.',
+    video: YT('rfMaANCbzx8', 'Cómo hacer dominadas supinas correctamente', 'Your House Fitness') },
+  negative: {
+    steps: ['Pon una silla firme bajo la barra.',
+      'Súbete o salta hasta quedar con la barbilla sobre la barra, tomándola con las palmas hacia ti.',
+      'Saca los pies de la silla y baja lo más lento que puedas, en 3-5 s, hasta estirar los brazos.',
+      'Vuelve a subir con ayuda de la silla (no tirando) y repite.'],
+    errors: ['Dejarte caer rápido.', 'Soltarte de golpe al final.', 'Subir tirando en vez de con la silla.'],
+    shoulder: 'Detente si duele en la parte baja, cuando los brazos están casi estirados.',
+    video: YT('lRd0fo8IIeQ', 'Dominada negativa con salto', 'Kranos Calistenia') },
+  row1: {
+    steps: ['Apoya en una silla o banco la rodilla y la mano del mismo lado. La otra pierna queda en el suelo y la espalda recta, casi paralela al suelo.',
+      'Toma la mancuerna con la otra mano, con el brazo estirado hacia el suelo.',
+      'Tira llevando el codo hacia la cadera (no hacia el hombro), pegado al cuerpo.',
+      'Aprieta la escápula 1 s arriba y baja lento. Termina las reps y cambia de brazo.'],
+    errors: ['Girar el torso para subir el peso.', 'Llevar el codo hacia la oreja.', 'Encorvar la espalda.'],
+    shoulder: 'Es amigable con el hombro. Si molesta, achica el recorrido arriba.',
+    video: YT('ryhxLQUn-cQ', 'Remo con mancuerna a una mano: técnica paso a paso', 'BuhoSalud') },
+  rear_fly: {
+    steps: ['De pie o sentado en el borde de una silla, inclina el torso hacia adelante (casi paralelo al suelo), con la espalda recta.',
+      'Deja las mancuernas colgando bajo el pecho, con las palmas enfrentadas y los codos un poco doblados.',
+      'Abre los brazos hacia los lados como alas, hasta la altura de los hombros, juntando las escápulas.',
+      'Baja lento.'],
+    errors: ['Usar impulso.', 'Subir los hombros hacia las orejas.', 'Usar demasiado peso: aquí se trabaja liviano.'],
+    video: YT('ZoUr3z-3EjM', 'Aperturas inversas con mancuernas: cómo hacerlas correctamente', 'Bienestar Integral Tv') },
+  curl: {
+    steps: ['De pie, con las mancuernas a los lados y las palmas hacia adelante.',
+      'Mantén los codos pegados a los costados.',
+      'Sube doblando solo los codos, hasta que las mancuernas lleguen cerca de los hombros.',
+      'Baja lento hasta estirar los brazos.'],
+    errors: ['Balancear el cuerpo.', 'Adelantar los codos.', 'Bajar sin control.'],
+    video: YT('rqy0oxx__sU', 'Curl de bíceps con mancuernas de pie', 'Fitness real con el coach Emmanuel Navarro') },
+  hammer: {
+    steps: ['De pie, con las mancuernas a los lados y las palmas mirando hacia tu cuerpo, como si tomaras un martillo.',
+      'Mantén los codos pegados a los costados.',
+      'Sube doblando los codos sin girar las muñecas.',
+      'Baja lento.'],
+    errors: ['Balancear el cuerpo.', 'Girar las muñecas.', 'Separar los codos del cuerpo.'],
+    video: YT('RHdacbwKbTo', 'Cómo hacer curl martillo con mancuerna', 'Your House Fitness') },
+  floor_press: {
+    steps: ['Acuéstate de espalda en el suelo, con las rodillas dobladas y los pies apoyados.',
+      'Sube las mancuernas sobre el pecho con los brazos estirados.',
+      'Baja doblando los codos, separados del cuerpo unos 45° (no abiertos en cruz), hasta que el brazo toque suave el suelo.',
+      'Haz una pausa breve y empuja hacia arriba.'],
+    errors: ['Abrir los codos en forma de T.', 'Rebotar los codos contra el suelo.', 'Arquear mucho la espalda.'],
+    shoulder: 'Si molesta, usa agarre neutro (palmas enfrentadas). El suelo ya limita el recorrido para proteger el hombro.',
+    video: YT('z-bMvgs5oEE', 'Press de pecho en el suelo (floor press)', 'Harbiz') },
+  pushup: {
+    steps: ['Apoya las manos un poco más anchas que los hombros, con el cuerpo recto de la cabeza a los talones (aprieta glúteos y abdomen).',
+      'Baja el pecho hacia el suelo con los codos a unos 45° del cuerpo.',
+      'Empuja hasta estirar los brazos.',
+      'Versión más fácil: inclinada, con las manos en una mesa o en la pared, o con las rodillas apoyadas.'],
+    errors: ['Dejar caer la cadera.', 'Abrir los codos en T.', 'Adelantar la cabeza.'],
+    shoulder: 'Si molesta, hazlas inclinado. Mientras más alta la superficie, más fácil.',
+    video: YT('e_EKkqoHxns', 'Cómo hacer flexiones de brazos para principiantes, paso a paso', 'Patricio Almirón') },
+  neutral_press: {
+    steps: ['Siéntate con la espalda apoyada en un respaldo.',
+      'Pon las mancuernas a la altura de los hombros, con las palmas enfrentadas y los codos hacia adelante.',
+      'Empuja hacia arriba, sin trabar los codos, hasta donde no duela.',
+      'Baja lento.'],
+    errors: ['Arquear la espalda baja.', 'Bajar de golpe.', 'Usar impulso.'],
+    shoulder: 'Solo si levantar el brazo sobre la cabeza no duele, y cuando el dolor lleve 2 semanas en 0-1.',
+    video: YT('ODHi3sjRd-A', 'Press sentado con mancuernas, con agarre neutro', 'Rodrigo Bermejo Trainer') },
+  lateral: {
+    steps: ['De pie, con las mancuernas a los lados y los codos un poco doblados.',
+      'Sube los brazos hacia los lados y un poco hacia adelante (unos 30°, el "plano escapular").',
+      'Para a la altura de los hombros, no más arriba.',
+      'Baja lento, en 2-3 s.'],
+    errors: ['Subir sobre la altura de los hombros.', 'Encoger los hombros o balancearte.', 'Girar los pulgares hacia abajo, como "vaciando una botella": irrita el hombro.'],
+    shoulder: 'Peso liviano. Si molesta, sube menos.',
+    video: YT('Q5m5SRZoWgw', 'Elevación de hombros en el plano de la escápula', 'Proet Ejercicio Terapéutico') },
+  kickback: {
+    steps: ['Ponte en la misma posición del remo: rodilla y mano apoyadas en una silla, espalda recta.',
+      'Sube el codo hasta que el brazo quede pegado al costado, paralelo al suelo, con el antebrazo colgando.',
+      'Estira el codo llevando la mancuerna hacia atrás, hasta que todo el brazo quede recto.',
+      'Vuelve lento. El brazo, del hombro al codo, no se mueve.'],
+    errors: ['Mover el codo hacia arriba y abajo.', 'Balancear la mancuerna.', 'Encorvar la espalda.'],
+    video: YT('KBX9Sf0P_eo', 'Patada de tríceps con mancuerna apoyado en banco', 'ReevolveFit') },
+  goblet: {
+    steps: ['Toma una mancuerna en vertical con ambas manos por un extremo y pégala al pecho.',
+      'Pies al ancho de los hombros o un poco más, con las puntas algo hacia afuera.',
+      'Baja como si te sentaras en una silla: cadera atrás y abajo, rodillas en la dirección de los pies, pecho arriba.',
+      'Baja hasta donde mantengas la espalda recta y sube empujando el suelo con todo el pie.'],
+    errors: ['Levantar los talones.', 'Juntar las rodillas hacia adentro.', 'Redondear la espalda.'],
+    video: YT('5HHITKuLxUs', 'Cómo hacer sentadilla goblet con mancuerna', 'Your House Fitness') },
+  rdl: {
+    steps: ['De pie, con los pies al ancho de las caderas y las mancuernas delante de los muslos.',
+      'Dobla un poco las rodillas y déjalas fijas.',
+      'Lleva la cadera hacia atrás, como si cerraras una puerta con el trasero. El torso se inclina con la espalda recta y las mancuernas bajan pegadas a las piernas.',
+      'Baja hasta media canilla o hasta sentir que se estira la parte de atrás del muslo. Sube empujando la cadera hacia adelante y apretando glúteos.'],
+    errors: ['Redondear la espalda.', 'Doblar mucho las rodillas (se vuelve sentadilla).', 'Alejar las mancuernas de las piernas.'],
+    video: YT('9j_L1KgpK8Y', 'Cómo hacer un peso muerto rumano con mancuernas', 'Your House Fitness') },
+  lunge: {
+    steps: ['De pie, con una mancuerna en cada mano a los lados.',
+      'Da un paso largo hacia adelante (o hacia atrás, que es más fácil para la rodilla).',
+      'Baja hasta que ambas rodillas queden cerca de 90°, con la de atrás casi tocando el suelo.',
+      'Empuja con el pie de adelante para volver. Termina las reps de una pierna y cambia.'],
+    errors: ['Dejar que la rodilla se vaya hacia adentro.', 'Inclinar mucho el torso.', 'Dar un paso muy corto.'],
+    video: YT('y8zPm7gJR_E', 'Zancadas con mancuernas', 'Proet Ejercicio Terapéutico') },
+  bridge: {
+    steps: ['Acuéstate de espalda, con las rodillas dobladas y los pies apoyados cerca de los glúteos.',
+      'Pon la mancuerna sobre la cadera, sujeta con las manos (usa una toalla si molesta).',
+      'Empuja con los talones y sube la cadera hasta que hombros, cadera y rodillas formen una línea.',
+      'Aprieta los glúteos 1 s arriba y baja lento.'],
+    errors: ['Arquear la espalda baja en vez de usar los glúteos.', 'Empujar con la punta de los pies.', 'Bajar de golpe.'],
+    video: YT('pbqYDNHBWj4', 'Puente de glúteos con mancuerna', 'Emiliano Salas Porta') },
+  calf: {
+    steps: ['Ponte de pie con la punta de los pies en el borde de un escalón y los talones en el aire. Apóyate en la pared con una mano y toma la mancuerna con la otra.',
+      'Sube en puntas lo más alto que puedas y haz una pausa de 1 s.',
+      'Baja lento, hasta que los talones queden bajo el nivel del escalón, y haz otra pausa de 1 s.',
+      'Sin escalón también sirve: hazlo en el suelo.'],
+    errors: ['Rebotar abajo.', 'Hacerlo rápido.', 'Doblar las rodillas para ayudarte.'],
+    video: YT('OKFDQOQAk6w', 'Elevaciones de talón en escalón', 'Francisco Cuevas Nutriologo') },
+  dead_bug: {
+    steps: ['Acuéstate de espalda, con los brazos estirados hacia el techo y las piernas arriba, rodillas dobladas en 90° (como una mesa).',
+      'Pega la zona lumbar al suelo apretando el abdomen.',
+      'Baja lento un brazo hacia atrás de la cabeza y, a la vez, la pierna contraria hacia el suelo, sin que la espalda se despegue.',
+      'Vuelve y alterna de lado. Cada lado cuenta como 1 rep.'],
+    errors: ['Despegar la zona lumbar del suelo.', 'Hacerlo rápido.', 'Aguantar la respiración.'],
+    shoulder: 'Si llevar el brazo hacia atrás molesta, deja los brazos quietos y mueve solo las piernas.',
+    video: YT('SPTBzZdINlg', 'Dead bug (abdominales)', 'Carlos Ruiz') },
+  plank: {
+    steps: ['Apoya los antebrazos en el suelo, con los codos bajo los hombros.',
+      'Estira las piernas y apóyate en la punta de los pies.',
+      'Mantén el cuerpo recto de la cabeza a los talones, apretando abdomen y glúteos.',
+      'Respira normal y aguanta el tiempo meta.'],
+    errors: ['Dejar caer la cadera.', 'Levantar mucho el trasero.', 'Aguantar la respiración.'],
+    shoulder: 'Si molesta el hombro, apoya las rodillas.',
+    video: YT('QU45oICbzPM', 'Cómo hacer plancha sobre antebrazos', 'Estudio Training') },
+  knee_raise: {
+    steps: ['Cuélgate de la barra con los hombros activos (no colgado flojo).',
+      'Sube las rodillas hacia el pecho, enrollando un poco la pelvis.',
+      'Baja lento, sin balancearte.'],
+    errors: ['Balancearte o usar impulso.', 'Colgar flojo de los hombros.', 'Bajar las piernas de golpe.'],
+    shoulder: 'Solo si colgarte no duele. Si duele, cámbialo por dead bug.',
+    video: YT('b6ISbdie4u4', 'Elevación de rodillas colgado', 'Arzur PT') },
+};
 
 const WARMUP = [
   '5 min de movilidad general (caminar, saltos suaves)',
@@ -605,6 +812,34 @@ function updPainSlider(id, v) {
   const w = $(`#${id}-w`); if (w) w.textContent = painWord(v);
 }
 const shoulderBadge = ex => ex.shoulder === 'care' ? '<span class="badge care">⚠ cuidado</span>' : '';
+function guideHtml(ex) {
+  const g = GUIDE[ex.id];
+  let h = '<div class="guide">';
+  if (g) {
+    h += `<h4>Cómo se hace</h4><ol class="howto">${g.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>`;
+    h += `<h4>Errores comunes</h4><ul class="dots small">${g.errors.map(s => `<li>${esc(s)}</li>`).join('')}</ul>`;
+  } else {
+    h += `<h4>Cómo se hace</h4><p class="small">${esc(ex.tip || 'Sin descripción. Puedes agregar un tip editando el ejercicio en Más.')}</p>`;
+  }
+  const care = [g && g.shoulder, ex.shoulder === 'care' && g ? ex.tip : ''].filter(Boolean);
+  if (care.length) h += `<div class="note ${ex.shoulder === 'care' ? 'warn' : 'info'} small"><b>${ex.shoulder === 'care' ? '⚠ ' : ''}Tu hombro:</b> ${care.map(esc).join(' ')}</div>`;
+  if (g && g.video) {
+    h += `<a class="btn block vid" href="${esc(g.video.url)}" target="_blank" rel="noopener">▶ Ver video</a>
+      <p class="tiny muted center">“${esc(g.video.title)}” · ${esc(g.video.channel)}<br>Se abre en YouTube (necesita internet)</p>`;
+  } else {
+    h += `<a class="btn block vid" href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' técnica')}" target="_blank" rel="noopener">▶ Buscar videos</a>
+      <p class="tiny muted center">Se abre en YouTube (necesita internet)</p>`;
+  }
+  return h + '</div>';
+}
+function guideModal(id, from) {
+  const ex = getEx(id);
+  const back = from === 'lib' ? `<button class="btn grow" data-act="lib-back">← Biblioteca</button><button class="btn pri grow" data-act="lib-pick" data-id="${esc(ex.id)}">+ Agregar</button>`
+    : '<button class="btn pri big" data-act="modal-close">Cerrar</button>';
+  openModal(`<div class="row between"><h2 class="mb0">${esc(ex.name)}</h2>${shoulderBadge(ex)}</div>
+    <p class="tiny muted">${esc(ex.group)} · ${esc(TYPES[ex.type] || '')} · meta ${esc(ex.goal)}${ex.type === 't' ? ' s' : ''}</p>
+    ${guideHtml(ex)}<div class="row mt2">${back}</div>`);
+}
 const sideTxt = () => ({ izq: 'izquierdo', der: 'derecho', ambos: '(ambos)' })[S.settings.side] || '';
 
 /* ---------- Vistas ---------- */
@@ -780,7 +1015,7 @@ function vItem(it, idx) {
   if (it.note) b += `<p class="small muted"><i>${esc(it.note)}</i></p>`;
   b += `<p class="small"><span class="muted">Última vez:</span> ${last ? `<b>${last.sets.map(s => fmtSet(ex, s)).join(' · ')}</b> <span class="muted tiny">(${relDay(last.s.start)}${ex.type === 'bw' ? ', reps' : ex.type === 'wr' ? ', kg×reps' : ''})</span>` : '<span class="muted">sin registros</span>'}</p>`;
   b += `<div class="note ${sg.tone} small">💡 ${esc(sg.text)}</div>`;
-  b += `<button class="link small" data-act="it-tip" data-uid="${it.uid}">${it.tip ? 'Ocultar técnica ▴' : 'Ver técnica ▾'}</button>${it.tip ? `<p class="small" style="margin-top:0">${esc(ex.tip || 'Sin tip.')}</p>` : ''}`;
+  b += `<button class="link" data-act="it-tip" data-uid="${it.uid}">${it.tip ? 'Ocultar cómo se hace ▴' : '📖 Cómo se hace ▾'}</button>${it.tip ? guideHtml(ex) : ''}`;
   const A = `data-uid="${it.uid}"`;
   b += '<div class="steps">';
   if (ex.type === 'wr') b += stepper('Peso', `${kg(it.inp.w)}<small>kg</small>`, 'step', `${A} data-f="w"`);
@@ -911,6 +1146,7 @@ function vProgreso() {
   const hist = ss.map(s => ({ s, sets: s.items.filter(i => i.ex === ex.id).flatMap(i => i.done) })).filter(x => x.sets.length);
   const lab = hist.map(x => sd(x.s.start));
   let h = `<div class="card"><div class="field" style="margin-top:0"><label for="prog-ex">Ejercicio</label><select class="inp" id="prog-ex" data-in="prog-ex">${used.map(id => `<option value="${esc(id)}" ${id === ex.id ? 'selected' : ''}>${esc(getEx(id).name)}</option>`).join('')}</select></div>
+    <button class="link" data-act="guide-open" data-id="${esc(ex.id)}">📖 Cómo se hace</button>
     <div class="seg" role="tablist">${ms.map(([k, l]) => `<button class="${k === UI.prog.metric ? 'on' : ''}" data-act="prog-metric" data-m="${k}">${esc(l.replace(/ \(.*\)/, ''))}</button>`).join('')}</div>
     <h3>${esc(ms.find(m => m[0] === UI.prog.metric)[1])}</h3>
     ${lineChart({ labels: lab, series: [{ color: '#7cb1ff', values: hist.map(x => Math.round(metricVal(UI.prog.metric, x.sets) * 10) / 10) }], label: 'Progreso del ejercicio' })}
@@ -954,6 +1190,8 @@ function vMas() {
     <div class="field"><label for="phase-since">Fase actual desde</label><input class="inp" type="date" id="phase-since" data-in="phase-since" value="${esc(st.phaseSince || st.startDate)}"></div>
     ${[1, 2, 3].map(p => `<h3>Fase ${p} · ${PHASES[p].weeks} · "${PHASES[p].name}"</h3><ul class="dots small">${PHASES[p].bullets.map(b => `<li>${esc(b)}</li>`).join('')}</ul>`).join('')}
     <h3>Reglas para avanzar</h3><ul class="dots small"><li>2 semanas seguidas cumpliendo la meta semanal, y</li><li>dolor promedio antes de entrenar ≤2, y</li><li>el dolor no sube más de 2 puntos durante las sesiones.</li><li>Si el dolor promedio de la última semana es ≥4, la app sugiere volver a la fase anterior.</li></ul></div>`;
+  h += `<div class="card"><h2>📖 Guía de ejercicios</h2><p class="muted small">Toca un ejercicio para ver cómo se hace, los errores comunes y un video.</p>
+    ${GROUPS.map(g => { const es = allEx().filter(e => e.group === g); return es.length ? `<h3>${esc(g)}</h3>${es.map(e => `<button class="lib-item" data-act="guide-open" data-id="${esc(e.id)}"><span class="grow"><b>${esc(e.name)}</b></span>${shoulderBadge(e)}<span class="muted">›</span></button>`).join('')}` : ''; }).join('')}</div>`;
   h += `<div class="card"><div class="row between"><h2 class="mb0">Mis plantillas</h2><button class="btn sm" data-act="tpl-new">+ Nueva</button></div>
     ${S.templates.length ? `<div class="mt">${S.templates.map(t => `<div class="list-row"><span class="grow"><b>${esc(t.name)}</b><div class="tiny muted">${plural(t.items.length, 'ejercicio', 'ejercicios')}</div></span><button class="btn sm" data-act="tpl-edit" data-id="${t.id}">Editar</button><button class="btn sm danger icon" data-act="tpl-del" data-id="${t.id}" aria-label="Borrar plantilla">✕</button></div>`).join('')}</div>` : '<p class="muted small">Aún no tienes plantillas propias. Puedes crearlas aquí o guardar una sesión como plantilla.</p>'}</div>`;
   const mine = S.exercises.filter(e => !e.hidden);
@@ -986,7 +1224,7 @@ function libModal() {
   let list = '';
   groups.forEach(g => {
     const es = exs.filter(e => e.group === g); if (!es.length) return;
-    list += `<h3>${esc(g)}</h3>` + es.map(e => `<button class="lib-item" data-act="lib-pick" data-id="${esc(e.id)}"><span class="grow"><b>${esc(e.name)}</b><div class="tiny muted">${esc(TYPES[e.type])} · meta ${esc(e.goal)}</div></span>${shoulderBadge(e)}</button>`).join('');
+    list += `<h3>${esc(g)}</h3>` + es.map(e => `<div class="lib-row"><button class="lib-item" data-act="lib-pick" data-id="${esc(e.id)}"><span class="grow"><b>${esc(e.name)}</b><div class="tiny muted">${esc(TYPES[e.type])} · meta ${esc(e.goal)}</div></span>${shoulderBadge(e)}</button><button class="btn icon q" data-act="guide-open" data-id="${esc(e.id)}" data-from="lib" aria-label="Cómo se hace ${esc(e.name)}">?</button></div>`).join('');
   });
   return list || '<p class="muted">Nada coincide.</p>';
 }
@@ -1260,6 +1498,7 @@ const ACT = {
   },
   'imp-file': () => $('#imp-file').click(),
   'imp-paste': () => { const t = $('#imp-text').value.trim(); if (!t) return toast('Pega primero el JSON.', 'bad'); importData(t); },
+  'guide-open': d => guideModal(d.id, d.from),
   'modal-close': () => closeModal(),
   'modal-bg': (d, el, e) => { if (e.target === el) closeModal(); },
   'confirm-ok': () => { const fn = UI.confirmFn; closeModal(); if (fn) fn(); },
