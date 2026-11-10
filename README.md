@@ -10,6 +10,7 @@ La app vive en la carpeta [`mi-entreno/`](mi-entreno/). Es una sola página (HTM
 - **Sesión en curso**: calentamiento, cronómetro, "Última vez", sugerencia de progresión, registro de series con dolor, alertas, temporizador de descanso con sonido y vibración, pantalla siempre encendida. El borrador se guarda solo.
 - **Plan por fases** (Retomar → Construir base → Dividir) con reglas para avanzar o retroceder.
 - **Check-in del día siguiente**: "¿Cómo amaneció el hombro?".
+- **Guía de ejercicios**: pasos numerados, errores comunes, cuidados del hombro y un video para cada ejercicio.
 - **Historial** por mes, **Progreso** por ejercicio (gráficos SVG, récords, dolor) y **Ajustes** (pesos, descanso, plantillas y ejercicios propios, respaldo JSON).
 - Funciona **sin internet** y se puede instalar en la pantalla de inicio (PWA).
 
