@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elenco de Mi Entreno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Mismos colores que la app (diseño Lima Nocturna) */
+:root{
+  --bg:#0d0f14;--s1:#161a22;--s2:#1c2029;--s3:#262b36;--line:#232835;--tx:#f2f4f8;--mu:#8d95a7;
+  --ac:#c8f53a;--ac-tx:#c8f53a;--ac-ink:#0d0f14;
+  --fig:#eef1f6;--fig-ink:#0d0f14;--prop:#4a5263;--prop2:#6b7487;
+  --f-num:"Barlow Condensed","Arial Narrow",sans-serif;--f-txt:Inter,system-ui,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --bg:#f3f4f7;--s1:#fff;--s2:#f0f2f6;--s3:#e2e6ed;--line:#e1e4ea;--tx:#11141a;--mu:#5a6273;
+    --ac-tx:#4a6600;--fig:#2a2f3a;--fig-ink:#ffffff;--prop:#b9c0cc;--prop2:#8f98a8;color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f3f4f7;--s1:#fff;--s2:#f0f2f6;--s3:#e2e6ed;--line:#e1e4ea;--tx:#11141a;--mu:#5a6273;
+  --ac-tx:#4a6600;--fig:#2a2f3a;--fig-ink:#ffffff;--prop:#b9c0cc;--prop2:#8f98a8;color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 var(--f-txt);padding:24px 16px 48px}
+main{max-width:640px;margin:0 auto}
+h1{font:700 36px/1 var(--f-num);margin:0 0 8px}
+h2{font:700 26px/1.1 var(--f-num);margin:36px 0 6px}
+p.lead,.mu{color:var(--mu)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.toolbar button{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--s2);color:var(--tx);font-weight:600;cursor:pointer}
+.toolbar button.on{background:var(--ac);color:var(--ac-ink);border-color:var(--ac)}
+
+/* Tarjetas del elenco */
+.cast{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.who{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.who:last-child:nth-child(odd){grid-column:1 / -1}
+.who svg{height:130px;width:auto}
+.who b{font:700 22px var(--f-num);margin-top:4px}
+.who .g{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.who .d{font-size:13.5px;color:var(--mu);margin-top:4px}
+
+/* Tarjeta de ejercicio animado */
+.demo{background:var(--s1);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:12px 0}
+.stage{position:relative;background:linear-gradient(180deg,var(--s2),var(--s1));display:flex;justify-content:center;align-items:flex-end;padding:8px 8px 0;min-height:150px}
+.stage svg{height:140px;width:auto;max-width:100%}
+.stage.rm{gap:6px}
+.stage.rm svg{height:120px}
+.stage .tag{position:absolute;left:12px;top:10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.demo .body{padding:12px 16px 16px}
+.demo .body b{font:700 24px/1.05 var(--f-num)}
+.bubble{position:relative;background:var(--s3);border-radius:14px;padding:10px 12px;margin-top:10px;font-size:15px}
+.bubble::before{content:"";position:absolute;left:22px;top:-7px;width:14px;height:14px;background:var(--s3);transform:rotate(45deg);border-radius:2px}
+.bubble small{display:block;color:var(--mu);font-size:12px;margin-bottom:2px}
+.tip{font-size:13.5px;color:var(--mu);margin-top:10px}
+.tip b{font:600 13.5px var(--f-txt);color:var(--tx)}
+
+/* Personajes: estilo común */
+.pj .limb{fill:none;stroke:var(--fig);stroke-linecap:round;stroke-linejoin:round}
+.pj .back{opacity:.5}
+.pj .headc{fill:var(--fig)}
+.pj .eye{fill:var(--fig-ink)}
+.pj .mouth{fill:none;stroke:var(--fig-ink);stroke-width:1.6;stroke-linecap:round}
+.pj .shirt{fill:none;stroke:var(--pc);stroke-linecap:round}
+.pj .acc{fill:var(--pc)}
+.pj .accs{fill:none;stroke:var(--pc);stroke-linecap:round}
+.pj .prop{fill:var(--prop)}
+.pj .props{fill:none;stroke:var(--prop);stroke-linecap:round}
+.pj .floor{stroke:var(--prop);stroke-width:2;opacity:.6}
+.pj .db{fill:var(--prop2)}
+.pj .towel{fill:#f4ead2;stroke:var(--bg);stroke-width:1}
+.pj g{transform-box:view-box}
+.pj.paused *{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){.pj *{animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>El elenco de Mi Entreno</h1>
+  <p class="lead">Cinco personajes originales, uno por grupo de ejercicios. Comparten esqueleto y estilo (formas simples, trazo grueso redondeado) y cada uno tiene su color. Abajo hay 3 animaciones de prueba.</p>
+  <div class="toolbar" role="group" aria-label="Opciones de vista">
+    <button id="t-theme" type="button">Cambiar tema claro/oscuro</button>
+    <button id="t-rm" type="button" aria-pressed="false">Ver como “menos movimiento”</button>
+  </div>
+
+  <h2>Los 5 personajes</h2>
+  <div class="cast" id="cast"></div>
+
+  <h2>3 animaciones de prueba</h2>
+  <p class="mu">Bucles cortos con la técnica segura de la guía. Se pausan solos cuando salen de la pantalla.</p>
+  <div id="demos"></div>
+</main>
+
+<script>
+'use strict';
+/* =========================================================
+   ESQUELETO (rig) común
+   Vista de perfil, mirando a la derecha. Todas las articulaciones
+   tienen la misma posición en todos los personajes, así una
+   animación sirve para cualquiera. Ángulos: positivo = horario.
+   ========================================================= */
+const J = { hip: [80, 82], sh: [80, 50], neck: [80, 46], head: [80, 34], el: [80, 70], wr: [80, 88], kn: [80, 106], an: [80, 130] };
+const o = p => `transform-origin:${p[0]}px ${p[1]}px`;
+
+/* Personajes: solo cambian la apariencia, no las medidas */
+/* color del nombre en texto: el lima del Coach se oscurece en tema claro para que se lea */
+const ink = k => k === 'coach' ? 'var(--ac-tx)' : CAST[k].color;
+const CAST = {
+  coach:  { name: 'Coach Hombro', group: 'Rehab hombro', color: '#c8f53a', torso: 14, limb: 7,
+    desc: 'Tranquilo, con banda en la frente. Es quien da los avisos de dolor.' },
+  tiron:  { name: 'Tirón', group: 'Tirón / barra', color: '#3987e5', torso: 10, limb: 6,
+    desc: 'Delgado y ágil, con el pelo en punta. Siempre cerca de la barra.' },
+  empuje: { name: 'Empuje', group: 'Empuje', color: '#e0703a', torso: 20, limb: 8,
+    desc: 'Fuerte y redondeado, con muñequeras.' },
+  patas:  { name: 'Patas', group: 'Piernas', color: '#9085e9', torso: 12, limb: 7,
+    desc: 'Piernas largas con calcetas altas y zapatillas grandes.' },
+  nucleo: { name: 'Núcleo', group: 'Core', color: '#e87ba4', torso: 18, limb: 7,
+    desc: 'Compacto, con una franja en el abdomen.' },
+};
+
+/* Piezas que cambian según el personaje */
+function headParts(c) {
+  const [x, y] = J.head;
+  let h = `<circle class="headc" cx="${x}" cy="${y}" r="11"/>
+    <circle class="eye" cx="${x + 5}" cy="${y - 1.5}" r="1.8"/>
+    <path class="mouth" d="M${x + 3} ${y + 5} q3 2 6 -1"/>`;
+  if (c === 'coach') h += `<rect class="acc" x="${x - 11.5}" y="${y - 7}" width="23" height="4.5" rx="2"/><path class="accs" stroke-width="3" d="M${x - 10} ${y - 5} l-7 4 M${x - 10} ${y - 4} l-6 7"/>`;
+  if (c === 'tiron') h += `<path class="acc" d="M${x - 9} ${y - 6} l2 -9 l4 6 l3 -9 l3 8 l4 -7 l1 9 z"/>`;
+  return h;
+}
+function shoe(c) {
+  const [x, y] = J.an;
+  if (c === 'patas') return `<path class="acc" d="M${x - 5} ${y - 4} h10 q9 0 11 6 v3 h-21 z"/>`;
+  return `<path class="limb" stroke-width="6" d="M${x - 1} ${y + 1} h10"/>`;
+}
+function leg(c, side) {
+  const C = CAST[c], cls = side === 'b' ? 'back' : '';
+  const sock = c === 'patas' ? `<path class="accs" stroke-width="${C.limb + 1}" d="M${J.an[0]} ${J.an[1] - 12} V${J.an[1] - 2}"/>` : '';
+  return `<g class="th-${side} ${cls}" style="${o(J.hip)}"><path class="limb" stroke-width="${C.limb}" d="M${J.hip[0]} ${J.hip[1]} L${J.kn[0]} ${J.kn[1]}"/>
+    <g class="sh-${side}" style="${o(J.kn)}"><path class="limb" stroke-width="${C.limb}" d="M${J.kn[0]} ${J.kn[1]} L${J.an[0]} ${J.an[1]}"/>${sock}
+      <g class="ft-${side}" style="${o(J.an)}">${shoe(c)}</g></g></g>`;
+}
+/* hold: qué tiene en la mano ('db' mancuerna lateral, 'dbv' mancuerna vertical al pecho) */
+function arm(c, side, hold) {
+  const C = CAST[c], cls = side === 'b' ? 'back' : '';
+  const [wx, wy] = J.wr;
+  const band = c === 'empuje' ? `<path class="accs" stroke-width="${C.limb + 2}" d="M${wx} ${wy - 6} V${wy - 2}"/>` : '';
+  let h2 = '';
+  if (hold === 'db') h2 = `<rect class="db" x="${wx - 7}" y="${wy - 1}" width="14" height="7" rx="3"/>`;
+  if (hold === 'dbv') h2 = `<rect class="db" x="${wx - 3.5}" y="${wy - 4}" width="7" height="16" rx="3"/>`;
+  return `<g class="ua-${side} ${cls}" style="${o(J.sh)}"><path class="limb" stroke-width="${C.limb}" d="M${J.sh[0]} ${J.sh[1]} L${J.el[0]} ${J.el[1]}"/>
+    <g class="fa-${side}" style="${o(J.el)}"><path class="limb" stroke-width="${C.limb}" d="M${J.el[0]} ${J.el[1]} L${wx} ${wy}"/>${band}
+      <circle class="headc" cx="${wx}" cy="${wy + 1}" r="${C.limb / 2 + 1.5}"/>${h2}</g></g>`;
+}
+function torso(c) {
+  const C = CAST[c];
+  let h = `<path class="shirt" stroke-width="${C.torso}" d="M${J.hip[0]} ${J.hip[1] - 2} L${J.sh[0]} ${J.sh[1] + 3}"/>`;
+  if (c === 'nucleo') h += `<path class="limb" stroke-width="${C.torso + 0.5}" stroke-linecap="butt" style="stroke:var(--fig);opacity:.85" d="M${J.hip[0]} ${J.hip[1] - 14} V${J.hip[1] - 9}"/>`;
+  return h;
+}
+
+/* Arma el SVG completo. props: elementos de fondo; hide: segmentos ocultos */
+function rig(c, { cls = '', props = '', hold = { f: '', b: '' }, front = '' } = {}) {
+  return `<svg class="pj ${cls}" viewBox="0 0 160 140" style="--pc:${CAST[c].color}" role="img" aria-label="${CAST[c].name}">
+    ${props}
+    <g class="root" style="${o(J.hip)}">
+      ${leg(c, 'b')}
+      <g class="tor" style="${o(J.hip)}">
+        ${arm(c, 'b', hold.b)}
+        ${torso(c)}
+        <g class="hd" style="${o(J.neck)}">${headParts(c)}</g>
+        ${arm(c, 'f', hold.f)}
+      </g>
+      ${leg(c, 'f')}
+    </g>${front}
+  </svg>`;
+}
+
+/* =========================================================
+   ANIMACIONES (en la app irán en js/animaciones.js)
+   { personaje, duracion (s), props, base: pose fija, keys: fotogramas por segmento }
+   ========================================================= */
+const R = d => `rotate(${d}deg)`;
+const ANIM = {
+  /* Rotación externa: acostado de lado, codo pegado con la toalla, el antebrazo
+     sube como una puerta que se abre (hacia el techo) y baja lento.
+     Visto de frente, el giro se ve como el antebrazo que pasa de apuntar al suelo a apuntar arriba. */
+  rot_ext: {
+    who: 'coach', dur: 3.2, hold: { f: 'db', b: '' }, hide: ['ua-b'],
+    props: `<line class="floor" x1="6" y1="114" x2="154" y2="114"/><rect class="prop" x="10" y="108" width="32" height="6" rx="3"/>`,
+    front: `<rect class="towel" x="62" y="99.5" width="12" height="5" rx="2.5"/>`,
+    base: { root: 'translate(0px,22px) rotate(-90deg)', 'ua-f': R(-7), 'th-f': R(-12), 'sh-f': R(22), 'th-b': R(-12), 'sh-b': R(22), 'ft-f': R(-10), 'ft-b': R(-10) },
+    /* scaleY: el antebrazo parte apoyado en la guata (apuntando un poco al suelo) y sube hacia el techo */
+    keys: { 'fa-f': [[0, 'rotate(97deg) scaleY(.45)'], [15, 'rotate(97deg) scaleY(.45)'], [50, 'rotate(97deg) scaleY(-.85)'], [62, 'rotate(97deg) scaleY(-.85)'], [100, 'rotate(97deg) scaleY(.45)']] },
+    tip: 'Acostado de lado, codo pegado al cuerpo con una toalla doblada. Peso muy liviano, 2-3 s por rep.',
+  },
+  /* Remo a una mano: rodilla y mano en el banco, espalda recta. El codo va hacia la cadera
+     (el brazo sube pegado al cuerpo) y el antebrazo queda colgando. */
+  row1: {
+    who: 'tiron', dur: 2.6, hold: { f: 'db', b: '' },
+    props: `<line class="floor" x1="6" y1="122" x2="154" y2="122"/>
+      <rect class="prop" x="26" y="94" width="96" height="7" rx="3"/><path class="props" stroke-width="4" d="M34 101 V121 M114 101 V121"/>`,
+    base: { root: 'translate(-20px,-12px)', tor: R(78), hd: R(-12), 'ua-b': R(-113), 'th-b': R(0), 'sh-b': R(90), 'ft-b': R(90), 'th-f': R(-6), 'sh-f': R(10), 'ft-f': R(-4) },
+    keys: {
+      'ua-f': [[0, R(-78)], [12, R(-78)], [45, R(-3)], [58, R(-3)], [100, R(-78)]],
+      'fa-f': [[0, R(0)], [12, R(0)], [45, R(-75)], [58, R(-75)], [100, R(0)]],
+    },
+    tip: 'Apoyo en banco o silla, lleva el codo hacia la cadera. Reps por brazo.',
+  },
+  /* Sentadilla goblet: mancuerna pegada al pecho, cadera atrás y abajo, espalda recta,
+     talones apoyados (el pie no se mueve). */
+  goblet: {
+    who: 'patas', dur: 2.8, hold: { f: 'dbv', b: '' },
+    props: `<line class="floor" x1="6" y1="134" x2="154" y2="134"/>`,
+    base: { 'ua-f': R(-28), 'fa-f': R(-128), 'ua-b': R(-24), 'fa-b': R(-132) },
+    keys: {
+      root: [[0, 'translate(0px,0px)'], [10, 'translate(0px,0px)'], [50, 'translate(-15.8px,25.4px)'], [60, 'translate(-15.8px,25.4px)'], [100, 'translate(0px,0px)']],
+      tor: [[0, R(0)], [10, R(0)], [50, R(30)], [60, R(30)], [100, R(0)]],
+      hd: [[0, R(0)], [10, R(0)], [50, R(-22)], [60, R(-22)], [100, R(0)]],
+      'th-f': [[0, R(0)], [10, R(0)], [50, R(-80)], [60, R(-80)], [100, R(0)]],
+      'th-b': [[0, R(0)], [10, R(0)], [50, R(-80)], [60, R(-80)], [100, R(0)]],
+      'sh-f': [[0, R(0)], [10, R(0)], [50, R(100)], [60, R(100)], [100, R(0)]],
+      'sh-b': [[0, R(0)], [10, R(0)], [50, R(100)], [60, R(100)], [100, R(0)]],
+      'ft-f': [[0, R(0)], [10, R(0)], [50, R(-20)], [60, R(-20)], [100, R(0)]],
+      'ft-b': [[0, R(0)], [10, R(0)], [50, R(-20)], [60, R(-20)], [100, R(0)]],
+    },
+    tip: 'Mancuerna pegada al pecho, espalda recta.',
+  },
+};
+
+/* Convierte cada animación en CSS: pose base, @keyframes con bucle,
+   y dos poses fijas (inicio y final) para "menos movimiento" */
+function animCss(id, a) {
+  let css = '';
+  Object.entries(a.base || {}).forEach(([seg, t]) => { css += `.ex-${id} .${seg}{transform:${t}}`; });
+  (a.hide || []).forEach(seg => { css += `.ex-${id} .${seg}{opacity:0}`; });
+  Object.entries(a.keys).forEach(([seg, fr]) => {
+    css += `@keyframes ${id}-${seg}{${fr.map(([p, t]) => `${p}%{transform:${t}}`).join('')}}`;
+    css += `.ex-${id}.loop .${seg}{animation:${id}-${seg} ${a.dur}s ease-in-out infinite}`;
+    const end = fr.reduce((m, f) => (Math.abs(f[0] - 50) < Math.abs(m[0] - 50) ? f : m));
+    css += `.ex-${id}.pose-a .${seg}{transform:${fr[0][1]}}.ex-${id}.pose-b .${seg}{transform:${end[1]}}`;
+  });
+  return css;
+}
+const style = document.createElement('style');
+style.textContent = Object.entries(ANIM).map(([id, a]) => animCss(id, a)).join('\n');
+document.head.appendChild(style);
+
+/* Frases de ejemplo (en la app irán en js/dialogos.js, con varias opciones por situación) */
+const SAY = {
+  coach: ['Hola, soy el Coach Hombro. Vamos de a poco: si algo molesta, me avisas.', 'Codo pegado al cuerpo, lento y sin dolor 👌'],
+  tiron: ['¡La barra es mi lugar feliz! Hoy tiramos con calma.', 'Codo hacia la cadera, no hacia la oreja.'],
+  empuje: ['Empujamos con control: codos a unos 45°.', 'Si el hombro reclama, bajamos el peso. Cero drama.'],
+  patas: ['Piernas al ataque, que el hombro descansa 🦵', 'Talones apoyados y espalda recta.'],
+  nucleo: ['Todo parte desde el centro.', 'Zona lumbar pegada al suelo, respira tranquilo.'],
+};
+
+/* Elenco quieto */
+const standing = { 'ua-f': R(-10), 'fa-f': R(-18), 'ua-b': R(8), 'fa-b': R(-10) };
+const castCss = Object.entries(standing).map(([s, t]) => `.still .${s}{transform:${t}}`).join('') +
+  '.still.tiron-bar .ua-f,.still.tiron-bar .ua-b{transform:rotate(-178deg)}.still.tiron-bar .fa-f,.still.tiron-bar .fa-b{transform:rotate(0deg)}' +
+  '.still.tiron-bar .root{transform:translate(0px,-8px)}';
+style.textContent += castCss;
+document.getElementById('cast').innerHTML = Object.entries(CAST).map(([k, c]) => {
+  const bar = k === 'tiron' ? `<path class="props" stroke-width="5" d="M40 4 H120"/><path class="props" stroke-width="3" d="M44 4 V0 M116 4 V0"/>` : '';
+  return `<div class="who"><span class="g">${c.group}</span>${rig(k, { cls: 'still' + (k === 'tiron' ? ' tiron-bar' : ''), props: bar })}
+    <b style="color:${ink(k)}">${c.name}</b><span class="d">${c.desc}</span>
+    <div class="bubble" style="text-align:left;width:100%"><small>${c.name}</small>${SAY[k][0]}</div></div>`;
+}).join('');
+
+/* Demos animadas */
+const NAMES = { rot_ext: 'Rotación externa con mancuerna', row1: 'Remo a una mano', goblet: 'Sentadilla goblet' };
+function demos(reduced) {
+  document.getElementById('demos').innerHTML = Object.entries(ANIM).map(([id, a]) => {
+    const c = CAST[a.who];
+    const stage = reduced
+      ? `<span class="tag">Inicio → final</span>${rig(a.who, { cls: `ex-${id} pose-a`, props: a.props, hold: a.hold, front: a.front })}<span class="mu" aria-hidden="true" style="align-self:center">→</span>${rig(a.who, { cls: `ex-${id} pose-b`, props: a.props, hold: a.hold, front: a.front })}`
+      : `<span class="tag">Así se hace</span>${rig(a.who, { cls: `ex-${id} loop`, props: a.props, hold: a.hold, front: a.front })}`;
+    return `<div class="demo"><div class="stage ${reduced ? 'rm' : ''}">${stage}</div>
+      <div class="body"><b>${NAMES[id]}</b> <span class="mu" style="font-size:13px">· con ${c.name}</span>
+        <div class="bubble"><small style="color:${ink(a.who)}">${c.name}</small>${SAY[a.who][1]}</div>
+        <div class="tip"><b>Tip de la guía:</b> ${a.tip}</div></div></div>`;
+  }).join('');
+  observe();
+}
+
+/* Pausa las animaciones que no se ven (ahorra batería) */
+let io = null;
+function observe() {
+  if (io) io.disconnect();
+  if (!('IntersectionObserver' in window)) return;
+  io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('paused', !e.isIntersecting)), { rootMargin: '40px' });
+  document.querySelectorAll('.pj.loop').forEach(s => io.observe(s));
+}
+
+const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+let rm = mq.matches;
+demos(rm);
+const bRm = document.getElementById('t-rm');
+bRm.classList.toggle('on', rm); bRm.setAttribute('aria-pressed', rm);
+bRm.onclick = () => { rm = !rm; bRm.classList.toggle('on', rm); bRm.setAttribute('aria-pressed', rm); demos(rm); };
+document.getElementById('t-theme').onclick = () => {
+  const root = document.documentElement, dark = getComputedStyle(root).colorScheme.includes('dark');
+  root.dataset.theme = dark ? 'light' : 'dark';
+};
+</script>
+</body>
+</html>
