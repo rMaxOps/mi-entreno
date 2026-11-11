@@ -1,4 +1,3 @@
-'use strict';
 /* =========================================================
    ANIMACIONES de cada ejercicio (skill personajes-animados)
    El esqueleto se ve de perfil, mirando a la derecha. Medidas:
@@ -21,21 +20,21 @@
    Segmentos: root, tor (torso), hd (cabeza), ua-f/ua-b (brazo), fa-f/fa-b (antebrazo),
               th-f/th-b (muslo), sh-f/sh-b (pierna), ft-f/ft-b (pie)
    ========================================================= */
-const R = d => `rotate(${d}deg)`;
-const T = (x, y) => `translate(${x}px,${y}px)`;
+export const R = d => `rotate(${d}deg)`;
+export const T = (x, y) => `translate(${x}px,${y}px)`;
 /* Arma fotogramas iguales para varios segmentos: kf([0,'a'],[50,'b']) */
-const kf = (...f) => f;
+export const kf = (...f) => f;
 /* Ida y vuelta típica: quieto, sube, pausa, baja */
-const ida = (a, b, p = [0, 12, 45, 58]) => [[p[0], a], [p[1], a], [p[2], b], [p[3], b], [100, a]];
+export const ida = (a, b, p = [0, 12, 45, 58]) => [[p[0], a], [p[1], a], [p[2], b], [p[3], b], [100, a]];
 
-const LYING = '0 50 160 85';
-const BAR = '0 -22 160 162';
+export const LYING = '0 50 160 85';
+export const BAR = '0 -22 160 162';
 
 /* Pose de remo (rodilla y mano en el banco), compartida por remo y patada de tríceps */
-const REMO_BASE = { root: T(-20, -12), tor: R(78), hd: R(-12), 'ua-b': R(-113), 'th-b': R(0), 'sh-b': R(90), 'ft-b': R(90), 'th-f': R(-6), 'sh-f': R(10), 'ft-f': R(-4) };
-const REMO_PROPS = ['suelo:122', 'banco'];
+export const REMO_BASE = { root: T(-20, -12), tor: R(78), hd: R(-12), 'ua-b': R(-113), 'th-b': R(0), 'sh-b': R(90), 'ft-b': R(90), 'th-f': R(-6), 'sh-f': R(10), 'ft-f': R(-4) };
+export const REMO_PROPS = ['suelo:122', 'banco'];
 
-const ANIMACIONES = {
+export const ANIMACIONES = {
   /* ---------------- Rehab hombro (Coach Hombro) ---------------- */
   /* Acostado de lado, codo pegado con la toalla. Visto de frente, el antebrazo
      pasa de apoyado en la guata a apuntar al techo (como una puerta que se abre). */
@@ -276,4 +275,4 @@ const ANIMACIONES = {
 };
 
 /* Ejercicios propios sin animación: pose genérica de su grupo */
-const GENERICA = { 'Rehab hombro': 'wall_slide', 'Tirón': 'row1', 'Empuje': 'floor_press', 'Piernas': 'goblet', 'Core': 'plank' };
+export const GENERICA = { 'Rehab hombro': 'wall_slide', 'Tirón': 'row1', 'Empuje': 'floor_press', 'Piernas': 'goblet', 'Core': 'plank' };
