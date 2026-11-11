@@ -1,4 +1,3 @@
-'use strict';
 /* =========================================================
    DIÁLOGOS de los personajes (skill personajes-animados)
    Frases cortas, cercanas y sin exagerar. Varias opciones por
@@ -6,7 +5,7 @@
    de dolor y nunca da diagnósticos: ante algo fuerte o raro,
    sugiere consultar al kinesiólogo.
    ========================================================= */
-const DIALOGOS = {
+export const DIALOGOS = {
   coach: {
     presentar: ['Hoy vamos de a poco. Si algo molesta, me avisas.', 'Lo importante hoy es la técnica, no el peso.', 'Escucha al hombro: él manda hoy.'],
     primero: ['Partimos suave. Primera serie con poco peso.', 'Calentamos bien y después vemos cómo responde el hombro.', 'Tranqui, la primera es para sentir el movimiento.'],
@@ -59,7 +58,7 @@ const DIALOGOS = {
 };
 
 /* Presentación de cada rutina base: qué se trabaja y en qué fijarse */
-const INTRO_RUTINA = {
+export const INTRO_RUTINA = {
   rehab: { who: 'coach', text: 'Hoy es día de cuidar el hombro: todo suave y lento. Fíjate en que nada duela.' },
   full: { who: 'coach', text: 'Cuerpo completo: un poco de todo. Fíjate en la técnica más que en el peso.' },
   a: { who: 'tiron', text: 'Hoy tiramos: espalda y bíceps. Fíjate en llevar el codo hacia la cadera.' },
@@ -69,8 +68,8 @@ const INTRO_RUTINA = {
 };
 
 /* Elige una frase sin repetir la última que dijo ese personaje en esa situación */
-const _ultimaFrase = {};
-function decir(who, sit) {
+export const _ultimaFrase = {};
+export function decir(who, sit) {
   const lista = (DIALOGOS[who] && DIALOGOS[who][sit]) || DIALOGOS.coach[sit] || [''];
   const k = who + ':' + sit;
   let i = Math.floor(Math.random() * lista.length);

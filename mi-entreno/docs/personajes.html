@@ -55,9 +55,6 @@ p.lead,.mu{color:var(--mu)}
 .tip b{font:600 13.5px var(--f-txt);color:var(--tx)}
 .pj-arrow{color:var(--mu)}
 </style>
-<script src="../js/animaciones.js"></script>
-<script src="../js/dialogos.js"></script>
-<script src="../js/personajes.js"></script>
 </head>
 <body>
 <main>
@@ -71,8 +68,10 @@ p.lead,.mu{color:var(--mu)}
   <div class="cast" id="cast"></div>
   <div id="demos"></div>
 </main>
-<script>
-'use strict';
+<!-- Usa los módulos de la app: ábrela desde un servidor (por ejemplo GitHub Pages), no como archivo suelto -->
+<script type="module">
+import { CAST, charInk, charOf, pjBubble, pjExercise, pjFrase, pjObserve, pjReduced, pjStill } from '../js/personajes.js';
+import { DIALOGOS } from '../js/dialogos.js';
 /* Lista de ejercicios de docs/especificacion.md (id, nombre, grupo, tip) */
 const EJ = [
   ['rot_ext', 'Rotación externa con mancuerna', 'Rehab hombro', 'Acostado de lado, codo pegado al cuerpo con una toalla doblada. Peso muy liviano, 2-3 s por rep.'],

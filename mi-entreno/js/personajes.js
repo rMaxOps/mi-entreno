@@ -1,30 +1,30 @@
-'use strict';
 /* =========================================================
    PERSONAJES (skill personajes-animados)
    Esqueleto SVG común + estilo de cada personaje + accesorios.
    Usa ANIMACIONES (js/animaciones.js). Se carga antes del script
    principal y no depende de él.
    ========================================================= */
+import { ANIMACIONES, GENERICA } from './animaciones.js';
 
 /* Articulaciones en la pose base (de pie, de perfil, mirando a la derecha) */
-const J = { hip: [80, 82], sh: [80, 50], neck: [80, 46], head: [80, 34], el: [80, 70], wr: [80, 88], kn: [80, 106], an: [80, 130] };
-const _o = p => `transform-origin:${p[0]}px ${p[1]}px`;
+export const J = { hip: [80, 82], sh: [80, 50], neck: [80, 46], head: [80, 34], el: [80, 70], wr: [80, 88], kn: [80, 106], an: [80, 130] };
+export const _o = p => `transform-origin:${p[0]}px ${p[1]}px`;
 
 /* El elenco: uno por grupo. Solo cambia la apariencia, no las medidas. */
-const CAST = {
+export const CAST = {
   coach: { name: 'Coach Hombro', group: 'Rehab hombro', color: '#c8f53a', torso: 14, limb: 7, desc: 'Tranquilo, con banda en la frente. Es quien da los avisos de dolor.' },
   tiron: { name: 'Tirón', group: 'Tirón', color: '#3987e5', torso: 10, limb: 6, desc: 'Delgado y ágil, con el pelo en punta. Siempre cerca de la barra.' },
   empuje: { name: 'Empuje', group: 'Empuje', color: '#e0703a', torso: 20, limb: 8, desc: 'Fuerte y redondeado, con muñequeras.' },
   patas: { name: 'Patas', group: 'Piernas', color: '#9085e9', torso: 12, limb: 7, desc: 'Piernas largas con calcetas altas y zapatillas grandes.' },
   nucleo: { name: 'Núcleo', group: 'Core', color: '#e87ba4', torso: 18, limb: 7, desc: 'Compacto, con una franja en el abdomen.' },
 };
-const CHAR_BY_GROUP = { 'Rehab hombro': 'coach', 'Tirón': 'tiron', 'Empuje': 'empuje', 'Piernas': 'patas', 'Core': 'nucleo' };
-const charOf = ex => CHAR_BY_GROUP[ex && ex.group] || 'coach';
+export const CHAR_BY_GROUP = { 'Rehab hombro': 'coach', 'Tirón': 'tiron', 'Empuje': 'empuje', 'Piernas': 'patas', 'Core': 'nucleo' };
+export const charOf = ex => CHAR_BY_GROUP[ex && ex.group] || 'coach';
 /* Color del nombre como texto: el lima del Coach se oscurece en tema claro */
-const charInk = who => who === 'coach' ? 'var(--ac-tx)' : CAST[who].color;
+export const charInk = who => who === 'coach' ? 'var(--ac-tx)' : CAST[who].color;
 
 /* ---------- Partes del cuerpo ---------- */
-function _head(c) {
+export function _head(c) {
   const [x, y] = J.head;
   let h = `<circle class="headc" cx="${x}" cy="${y}" r="11"/>
     <circle class="eye" cx="${x + 5}" cy="${y - 1.5}" r="1.8"/>
@@ -34,19 +34,19 @@ function _head(c) {
   if (c === 'tiron') h += `<path class="acc" d="M${x - 9} ${y - 6} l2 -9 l4 6 l3 -9 l3 8 l4 -7 l1 9 z"/>`;
   return h;
 }
-function _shoe(c) {
+export function _shoe(c) {
   const [x, y] = J.an;
   if (c === 'patas') return `<path class="acc" d="M${x - 5} ${y - 4} h10 q9 0 11 6 v3 h-21 z"/>`;
   return `<path class="limb" stroke-width="6" d="M${x - 1} ${y + 1} h10"/>`;
 }
-function _leg(c, s) {
+export function _leg(c, s) {
   const C = CAST[c];
   const sock = c === 'patas' ? `<path class="accs" stroke-width="${C.limb + 1}" d="M${J.an[0]} ${J.an[1] - 12} V${J.an[1] - 2}"/>` : '';
   return `<g class="th-${s} ${s === 'b' ? 'back' : ''}" style="${_o(J.hip)}"><path class="limb" stroke-width="${C.limb}" d="M${J.hip[0]} ${J.hip[1]} L${J.kn[0]} ${J.kn[1]}"/>
     <g class="sh-${s}" style="${_o(J.kn)}"><path class="limb" stroke-width="${C.limb}" d="M${J.kn[0]} ${J.kn[1]} L${J.an[0]} ${J.an[1]}"/>${sock}
       <g class="ft-${s}" style="${_o(J.an)}">${_shoe(c)}</g></g></g>`;
 }
-function _arm(c, s, hold) {
+export function _arm(c, s, hold) {
   const C = CAST[c], [wx, wy] = J.wr;
   const band = c === 'empuje' ? `<path class="accs" stroke-width="${C.limb + 2}" d="M${wx} ${wy - 6} V${wy - 2}"/>` : '';
   const db = {
@@ -58,7 +58,7 @@ function _arm(c, s, hold) {
     <g class="fa-${s}" style="${_o(J.el)}"><path class="limb" stroke-width="${C.limb}" d="M${J.el[0]} ${J.el[1]} L${wx} ${wy}"/>${band}
       <circle class="headc" cx="${wx}" cy="${wy + 1}" r="${C.limb / 2 + 1.5}"/>${db}</g></g>`;
 }
-function _torso(c) {
+export function _torso(c) {
   const C = CAST[c];
   let h = `<path class="shirt" stroke-width="${C.torso}" d="M${J.hip[0]} ${J.hip[1] - 2} L${J.sh[0]} ${J.sh[1] + 3}"/>`;
   if (c === 'nucleo') h += `<path class="limb" stroke-width="${C.torso + 0.5}" stroke-linecap="butt" style="opacity:.85" d="M${J.hip[0]} ${J.hip[1] - 14} V${J.hip[1] - 9}"/>`;
@@ -66,7 +66,7 @@ function _torso(c) {
 }
 
 /* ---------- Accesorios ('nombre:valor') ---------- */
-const PROPS = {
+export const PROPS = {
   suelo: (y = 134) => `<line class="floor" x1="-10" y1="${y}" x2="170" y2="${y}"/>`,
   barra: (y = 11) => `<path class="props" stroke-width="5" d="M40 ${y} H120"/><path class="props" stroke-width="3" d="M44 ${y} V${y - 14} M116 ${y} V${y - 14}"/>`,
   pared: (x = 104) => `<rect class="prop" x="${x}" y="-30" width="8" height="164"/>`,
@@ -75,10 +75,10 @@ const PROPS = {
   cojin: () => `<rect class="prop" x="10" y="108" width="32" height="6" rx="3"/>`,
   toalla: () => `<rect class="towel" x="62" y="99.5" width="12" height="5" rx="2.5"/>`,
 };
-const _props = list => (list || []).map(p => { const [n, v] = String(p).split(':'); return PROPS[n] ? PROPS[n](v === undefined ? undefined : +v) : ''; }).join('');
+export const _props = list => (list || []).map(p => { const [n, v] = String(p).split(':'); return PROPS[n] ? PROPS[n](v === undefined ? undefined : +v) : ''; }).join('');
 
 /* ---------- Arma un personaje ---------- */
-function pjRig(c, { cls = '', props = [], front = [], hold = {}, vista = '0 0 160 140', label = '' } = {}) {
+export function pjRig(c, { cls = '', props = [], front = [], hold = {}, vista = '0 0 160 140', label = '' } = {}) {
   return `<svg class="pj ${cls}" viewBox="${vista}" style="--pc:${CAST[c].color}" role="img" aria-label="${label || CAST[c].name}">
     ${_props(props)}
     <g class="root" style="${_o(J.hip)}">
@@ -89,7 +89,7 @@ function pjRig(c, { cls = '', props = [], front = [], hold = {}, vista = '0 0 16
 }
 
 /* ---------- CSS: estilo común + cada animación ---------- */
-function _animCss(id, a) {
+export function _animCss(id, a) {
   let css = '';
   Object.entries(a.base || {}).forEach(([seg, t]) => { css += `.ex-${id} .${seg}{transform:${t}}`; });
   (a.ocultar || []).forEach(seg => { css += `.ex-${id} .${seg}{opacity:0}`; });
@@ -131,14 +131,14 @@ function _animCss(id, a) {
 })();
 
 /* ---------- Lo que usa la app ---------- */
-const pjReduced = () => !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+export const pjReduced = () => !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 /* Id de la animación de un ejercicio (propia o la genérica de su grupo) */
-const pjAnimId = ex => ANIMACIONES[ex.id] ? ex.id : (GENERICA[ex.group] || 'plank');
+export const pjAnimId = ex => ANIMACIONES[ex.id] ? ex.id : (GENERICA[ex.group] || 'plank');
 /* Frase corta del ejercicio: la de la animación o el tip del ejercicio */
-const pjFrase = ex => ANIMACIONES[ex.id] ? ANIMACIONES[ex.id].frase : (ex.tip || ANIMACIONES[pjAnimId(ex)].frase);
+export const pjFrase = ex => ANIMACIONES[ex.id] ? ANIMACIONES[ex.id].frase : (ex.tip || ANIMACIONES[pjAnimId(ex)].frase);
 
 /* El personaje del grupo haciendo el ejercicio. Con "menos movimiento": inicio → final, sin bucle. */
-function pjExercise(ex, reduced = pjReduced()) {
+export function pjExercise(ex, reduced = pjReduced()) {
   const id = pjAnimId(ex), a = ANIMACIONES[id], who = charOf(ex);
   const opt = k => ({ cls: `ex-${id} ${k}`, props: a.props, front: a.delante, hold: a.mano || {}, vista: a.vista, label: `${CAST[who].name} haciendo ${ex.name}` });
   return reduced
@@ -146,17 +146,17 @@ function pjExercise(ex, reduced = pjReduced()) {
     : pjRig(who, opt('loop'));
 }
 /* Personaje quieto (para presentar la rutina, el check-in y el resumen) */
-function pjStill(who, mood = '') {
+export function pjStill(who, mood = '') {
   return pjRig(who, { cls: `still ${mood === 'serio' ? 'serio' : ''}`, props: [], label: CAST[who].name + (mood === 'serio' ? ' (serio)' : '') });
 }
 /* Globo de texto con el nombre del personaje */
-function pjBubble(who, text) {
+export function pjBubble(who, text) {
   return `<div class="bubble"><small style="color:${charInk(who)}">${CAST[who].name}</small>${text}</div>`;
 }
 
 /* Pausa las animaciones que salen de la pantalla (ahorra batería) */
-let _pjIO = null;
-function pjObserve() {
+export let _pjIO = null;
+export function pjObserve() {
   if (!('IntersectionObserver' in window)) return;
   if (!_pjIO) _pjIO = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('paused', !e.isIntersecting)), { rootMargin: '40px' });
   /* se vuelve a empezar en cada pantalla, así no quedan observados los dibujos que ya no existen */

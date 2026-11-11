@@ -1,0 +1,13 @@
+{
+  "app": {
+    "nombre": "Mi Entreno",
+    "aviso_medico": "Mi Entreno no es un dispositivo médico ni reemplaza a un profesional de la salud. Si sientes dolor fuerte, nuevo o punzante, hormigueo o pérdida de fuerza, para y consulta a tu kinesiólogo o médico."
+  },
+  "tabs": {
+    "inicio": "Inicio",
+    "entreno": "Entreno",
+    "historial": "Historial",
+    "progreso": "Progreso",
+    "mas": "Más"
+  }
+}

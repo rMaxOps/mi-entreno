@@ -1,4 +1,3 @@
-'use strict';
 /* =========================================================
    Crear una rutina desde una foto, un PDF o un texto pegado.
    Usa la API de Claude directo desde el navegador (la app es estática).
@@ -7,27 +6,36 @@
    Modo de prueba sin gastar API: abre la app con ?mock=1
    (o ?mock=401, ?mock=429, ?mock=offline para probar los errores).
    ========================================================= */
+import { GROUPS, TYPES } from './datos/catalogo.js';
+import { S, UI, save } from './estado.js';
+import { allEx, getEx } from './logica/ejercicios.js';
+import { ACT, HOOKS, INP } from './registro.js';
+import { shoulderBadge } from './ui/componentes.js';
+import { ask, closeModal, openModal } from './ui/modales.js';
+import { render } from './ui/render.js';
+import { toast } from './ui/toast.js';
+import { $, clamp, esc, kg, n1, plural, uid } from './util.js';
 
-const AI_KEY = 'mientreno.ai';          // aparte de mientreno.v1: así la key nunca sale en los respaldos
-const AI_DEFAULT_MODEL = 'claude-sonnet-5-5';
-const API_URL = 'https://api.anthropic.com/v1/messages';
-const API_VERSION = '2026-10-21';
-const MAX_PDF = 10 * 1024 * 1024;       // ~10 MB
-const MAX_IMG_SIDE = 1568;              // px por lado antes de enviar
-const MOCK = new URLSearchParams(location.search).get('mock');
+export const AI_KEY = 'mientreno.ai';          // aparte de mientreno.v1: así la key nunca sale en los respaldos
+export const AI_DEFAULT_MODEL = 'claude-sonnet-5-5';
+export const API_URL = 'https://api.anthropic.com/v1/messages';
+export const API_VERSION = '2026-10-21';
+export const MAX_PDF = 10 * 1024 * 1024;       // ~10 MB
+export const MAX_IMG_SIDE = 1568;              // px por lado antes de enviar
+export const MOCK = new URLSearchParams(location.search).get('mock');
 
-function aiCfg() {
+export function aiCfg() {
   try { const c = JSON.parse(localStorage.getItem(AI_KEY)) || {}; return { key: c.key || '', model: c.model || AI_DEFAULT_MODEL }; }
   catch (e) { return { key: '', model: AI_DEFAULT_MODEL }; }
 }
-function aiSave(c) {
+export function aiSave(c) {
   try { localStorage.setItem(AI_KEY, JSON.stringify(c)); return true; }
   catch (e) { toast('No se pudo guardar en este dispositivo.', 'bad'); return false; }
 }
-const maskKey = k => k.length > 12 ? `${k.slice(0, 7)}…${k.slice(-4)}` : '••••';
+export const maskKey = k => k.length > 12 ? `${k.slice(0, 7)}…${k.slice(-4)}` : '••••';
 
 /* ---------- Ajustes: tarjeta "Lectura de rutinas con IA" ---------- */
-function aiSettingsCard() {
+export function aiSettingsCard() {
   const c = aiCfg();
   return `<div class="card"><h2>Lectura de rutinas con IA</h2>
     <p class="muted small">Para leer fotos y PDF de rutinas, la app usa la API de Claude con tu propia API key.</p>
@@ -58,7 +66,7 @@ ACT['ai-model'] = () => {
 };
 
 /* ---------- Botón de entrada (en Entreno y en Más) ---------- */
-const importButton = () => `<button class="btn block" data-act="rut-open" style="margin:0 0 10px">📷 Crear rutina desde foto o PDF</button>`;
+export const importButton = () => `<button class="btn block" data-act="rut-open" style="margin:0 0 10px">📷 Crear rutina desde foto o PDF</button>`;
 
 /* ---------- La hoja de importación ---------- */
 /* UI.imp = { step: 'choose'|'paste'|'reading'|'error'|'review'|'confirm', file, payload, text, res, err, ctrl } */
@@ -81,17 +89,16 @@ ACT['rut-text-local'] = () => {
 INP['rut-text'] = v => { UI.imp.text = v; };
 
 /* Volver a dibujar la hoja sin perder la posición del scroll */
-function impRender() {
+export function impRender() {
   const prev = $('.sheet'), top = prev ? prev.scrollTop : 0;
   openModal(impView());
   const s = $('.sheet'); if (s) s.scrollTop = top;
 }
 
 /* Si se cierra la hoja mientras lee, se cancela la petición */
-const _closeModal = closeModal;
-closeModal = function () { if (UI.imp && UI.imp.ctrl) UI.imp.ctrl.abort(); UI.imp = null; _closeModal(); };
+HOOKS.closeModal.push(() => { if (UI.imp && UI.imp.ctrl) UI.imp.ctrl.abort(); UI.imp = null; });
 
-function impView() {
+export function impView() {
   const m = UI.imp, c = aiCfg(), canAI = !!(c.key || MOCK);
   const close = '<button class="btn block ghost mt" data-act="modal-close">Cancelar</button>';
   if (m.step === 'choose') return `<h2>Crear rutina desde foto o PDF</h2>
@@ -117,14 +124,14 @@ function impView() {
   if (m.step === 'confirm') return confirmView();
   return '';
 }
-function previewHtml(p) {
+export function previewHtml(p) {
   if (!p) return '';
   if (p.thumb) return `<img class="rut-prev" src="${p.thumb}" alt="Vista previa de la rutina">`;
   return `<div class="rut-file">${p.kind === 'pdf' ? '📄' : '✍️'} <span class="grow">${esc(p.label || '')}</span></div>`;
 }
 
 /* ---------- Archivos: foto (achicada) o PDF ---------- */
-async function onRutFile(e) {
+export async function onRutFile(e) {
   const f = e.target.files && e.target.files[0]; e.target.value = '';
   if (!f || !UI.imp) return;
   const isPdf = f.type === 'application/pdf' || /\.pdf$/i.test(f.name);
@@ -145,7 +152,7 @@ async function onRutFile(e) {
     impFail('No pude abrir ese archivo. Si es una foto del iPhone (HEIC), prueba sacándola con el botón "Sacar foto" o como captura de pantalla.', false);
   }
 }
-function fileToBase64(f) {
+export function fileToBase64(f) {
   return new Promise((ok, bad) => {
     const r = new FileReader();
     r.onload = () => ok(String(r.result).split(',')[1] || '');
@@ -153,7 +160,7 @@ function fileToBase64(f) {
   });
 }
 /* Achica a un máximo de 1568 px por lado y comprime en JPEG 0,85 */
-function shrinkImage(f) {
+export function shrinkImage(f) {
   return new Promise((ok, bad) => {
     const url = URL.createObjectURL(f), img = new Image();
     img.onload = () => {
@@ -173,7 +180,7 @@ function shrinkImage(f) {
 }
 
 /* ---------- Llamada a la API ---------- */
-const RUT_SCHEMA = {
+export const RUT_SCHEMA = {
   type: 'object', additionalProperties: false, required: ['nombre', 'notas', 'ejercicios', 'dudas'],
   properties: {
     nombre: { type: 'string' }, notas: { type: 'string' },
@@ -189,7 +196,7 @@ const RUT_SCHEMA = {
     dudas: { type: 'array', items: { type: 'string' } },
   },
 };
-function rutSystem() {
+export function rutSystem() {
   const lib = allEx().map(e => `${e.id} | ${e.name}`).join('\n');
   return `Eres el asistente de Mi Entreno, una app personal para registrar entrenamientos en casa con mancuernas y barra de dominadas. La persona está volviendo al ejercicio después de una lesión de hombro.
 
@@ -210,7 +217,7 @@ Reglas:
 Biblioteca (id | nombre):
 ${lib}`;
 }
-function rutContent(p) {
+export function rutContent(p) {
   const ask = p.kind === 'text'
     ? 'Esta es la rutina en texto. Devuélvela como JSON según las reglas.\n\n<rutina>\n' + p.text + '\n</rutina>'
     : 'Esta es la rutina. Devuélvela como JSON según las reglas.';
@@ -220,9 +227,9 @@ function rutContent(p) {
 }
 
 /* Solo estos modelos aceptan el respaldo automático "fallbacks" */
-const withFallback = m => /^claude-(sonnet-5-5|opus-5-5|opus-5|fable-5-[12])$/.test(m);
+export const withFallback = m => /^claude-(sonnet-5-5|opus-5-5|opus-5|fable-5-[12])$/.test(m);
 
-async function readWith(p) {
+export async function readWith(p) {
   const m = UI.imp; if (!m) return;
   m.payload = p; m.step = 'reading'; m.err = null; impRender();
   if (!MOCK && !navigator.onLine) return impFail('Sin conexión a internet. Conéctate y reintenta, o pega el texto de la rutina para leerla sin IA.', true);
@@ -266,8 +273,8 @@ async function readWith(p) {
   if (!parsed.ejercicios.length) return impFail('No encontré ejercicios en el archivo. ¿Es una rutina? Prueba con otra foto más nítida o pega el texto.', true);
   m.res = toReview(parsed); m.step = 'review'; impRender();
 }
-function impFail(msg, retry) { if (!UI.imp) return; UI.imp.step = 'error'; UI.imp.err = { msg, retry }; impRender(); }
-function httpMsg(st, detail) {
+export function impFail(msg, retry) { if (!UI.imp) return; UI.imp.step = 'error'; UI.imp.err = { msg, retry }; impRender(); }
+export function httpMsg(st, detail) {
   if (st === 401) return 'La API key no es válida. Revísala en Más → Lectura de rutinas con IA.';
   if (st === 403) return 'Tu API key no tiene permiso para usar este modelo.';
   if (st === 404) return `No existe el modelo "${aiCfg().model}". Revisa el nombre en Más.`;
@@ -279,8 +286,8 @@ function httpMsg(st, detail) {
 }
 
 /* ---------- Leer la respuesta con cuidado ---------- */
-const int = (v, a, b) => { const n = Math.round(Number(v)); return Number.isFinite(n) && v !== null && v !== '' ? clamp(n, a, b) : null; };
-function parseRutina(txt) {
+export const int = (v, a, b) => { const n = Math.round(Number(v)); return Number.isFinite(n) && v !== null && v !== '' ? clamp(n, a, b) : null; };
+export function parseRutina(txt) {
   let s = String(txt || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
   const a = s.indexOf('{'), b = s.lastIndexOf('}');
   if (a < 0 || b < a) return null;
@@ -300,10 +307,10 @@ function parseRutina(txt) {
 }
 
 /* ---------- Lector simple de líneas, sin IA ---------- */
-const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
-const STOP = new Set(['de', 'con', 'en', 'el', 'la', 'los', 'las', 'a', 'al', 'y', 'por', 'lado', 'c', 'kg', 'mancuerna', 'mancuernas']);
+export const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+export const STOP = new Set(['de', 'con', 'en', 'el', 'la', 'los', 'las', 'a', 'al', 'y', 'por', 'lado', 'c', 'kg', 'mancuerna', 'mancuernas']);
 /* Busca el ejercicio de la biblioteca que más se parece por palabras */
-function matchEx(name) {
+export function matchEx(name) {
   const w = norm(name).split(' ').filter(x => x.length > 2 && !STOP.has(x));
   if (!w.length) return null;
   let best = null, bs = 0;
@@ -316,7 +323,7 @@ function matchEx(name) {
   });
   return bs >= 0.6 ? best : null;
 }
-function parseLocal(text) {
+export function parseLocal(text) {
   const out = { nombre: '', notas: '', ejercicios: [], dudas: [] };
   /* quita viñetas y numeración al inicio ("-", "•", "1)", "2.") sin tocar el "3x10" */
   text.split(/\r?\n/).map(l => l.replace(/^\s*(?:[-•*·]+|\d+\s*[.)])\s*/, '').trim()).filter(Boolean).forEach(line => {
@@ -340,8 +347,8 @@ function parseLocal(text) {
 }
 
 /* ---------- Revisión editable ---------- */
-const OVERHEAD = /press (militar|de hombro|arnold)|sobre la cabeza|overhead|dominad|pull ?up|chin ?up|fondo|dips?\b|flexion|push ?up|handstand|vertical/i;
-function guessGroup(n) {
+export const OVERHEAD = /press (militar|de hombro|arnold)|sobre la cabeza|overhead|dominad|pull ?up|chin ?up|fondo|dips?\b|flexion|push ?up|handstand|vertical/i;
+export function guessGroup(n) {
   const s = norm(n);
   if (/rotacion|escapul|ytw|y t w|manguito|pared/.test(s)) return 'Rehab hombro';
   if (/sentadilla|zancada|estocada|peso muerto|puente|gluteo|talon|pantorr|pierna|squat|lunge|hip/.test(s)) return 'Piernas';
@@ -350,7 +357,7 @@ function guessGroup(n) {
   if (/press|flexion|fondo|triceps|elevacion|push|aperturas/.test(s)) return 'Empuje';
   return 'Core';
 }
-function toReview(r) {
+export function toReview(r) {
   return {
     name: r.nombre || 'Rutina importada', notes: r.notas || '', dudas: r.dudas || [],
     items: r.ejercicios.map(e => {
@@ -363,9 +370,9 @@ function toReview(r) {
     }),
   };
 }
-const careOf = it => it.match ? getEx(it.match).shoulder === 'care' : (it.hombro === 'care' || OVERHEAD.test(it.name));
+export const careOf = it => it.match ? getEx(it.match).shoulder === 'care' : (it.hombro === 'care' || OVERHEAD.test(it.name));
 
-function reviewView() {
+export function reviewView() {
   const r = UI.imp.res, lib = allEx();
   const care = r.items.filter(careOf);
   const opts = sel => `<option value="">— Ejercicio nuevo —</option>` + GROUPS.map(g => `<optgroup label="${esc(g)}">${lib.filter(e => e.group === g).map(e => `<option value="${esc(e.id)}" ${e.id === sel ? 'selected' : ''}>${esc(e.name)}</option>`).join('')}</optgroup>`).join('');
@@ -420,7 +427,7 @@ ACT['ri-save'] = () => {
   if (r.items.some(i => !i.name.trim())) return toast('Hay un ejercicio sin nombre.', 'bad');
   UI.imp.step = 'confirm'; impRender();
 };
-function confirmView() {
+export function confirmView() {
   const r = UI.imp.res, nuevos = r.items.filter(i => !i.match);
   return `<h2>¿Guardar “${esc(r.name.trim())}”?</h2>
     <p class="muted">Se creará una plantilla con ${plural(r.items.length, 'ejercicio', 'ejercicios')}${nuevos.length ? ` y se ${nuevos.length === 1 ? 'agregará 1 ejercicio nuevo' : `agregarán ${nuevos.length} ejercicios nuevos`} a tu biblioteca` : ''}.</p>
@@ -445,7 +452,7 @@ ACT['ri-confirm'] = () => {
 };
 
 /* ---------- Modo de prueba (?mock=1): respuestas guardadas, sin gastar API ---------- */
-async function mockFetch(p) {
+export async function mockFetch(p) {
   await new Promise(r => setTimeout(r, 900));
   const json = (status, body) => ({ ok: status < 400, status, json: async () => body });
   if (MOCK === '401') return json(401, { error: { message: 'invalid x-api-key' } });
