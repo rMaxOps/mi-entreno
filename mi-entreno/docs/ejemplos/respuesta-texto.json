@@ -1,0 +1,11 @@
+{
+  "nombre": "Rutina tirón suave",
+  "notas": "",
+  "ejercicios": [
+    {"match_id": "rot_ext", "nombre": "Rotación externa con mancuerna", "tipo": "wr", "series": 3, "reps_min": 12, "reps_max": 12, "segundos": null, "peso_kg": 2, "descanso_s": null, "hombro": "ok", "nota": ""},
+    {"match_id": "row1", "nombre": "Remo a una mano", "tipo": "wr", "series": 3, "reps_min": 10, "reps_max": 10, "segundos": null, "peso_kg": 6, "descanso_s": 90, "hombro": "ok", "nota": "por lado"},
+    {"match_id": "negative", "nombre": "Dominadas negativas", "tipo": "bw", "series": 2, "reps_min": 5, "reps_max": 5, "segundos": null, "peso_kg": null, "descanso_s": 120, "hombro": "care", "nota": ""},
+    {"match_id": "plank", "nombre": "Plancha", "tipo": "t", "series": 3, "reps_min": null, "reps_max": null, "segundos": 30, "peso_kg": null, "descanso_s": null, "hombro": "ok", "nota": ""}
+  ],
+  "dudas": ["No se indica el descanso de la rotación externa ni de la plancha."]
+}

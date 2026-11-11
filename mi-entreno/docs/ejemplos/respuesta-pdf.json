@@ -1,0 +1,13 @@
+{
+  "nombre": "Circuito piernas y core",
+  "notas": "Revista: 2 veces por semana, calentar 5 minutos antes.",
+  "ejercicios": [
+    {"match_id": "goblet", "nombre": "Sentadilla goblet", "tipo": "wr", "series": 3, "reps_min": 12, "reps_max": 12, "segundos": null, "peso_kg": 8, "descanso_s": 60, "hombro": "ok", "nota": ""},
+    {"match_id": "lunge", "nombre": "Zancadas", "tipo": "wr", "series": 3, "reps_min": 10, "reps_max": 10, "segundos": null, "peso_kg": null, "descanso_s": null, "hombro": "ok", "nota": "por pierna"},
+    {"match_id": "bridge", "nombre": "Puente de glúteo", "tipo": "wr", "series": 3, "reps_min": 15, "reps_max": 15, "segundos": null, "peso_kg": null, "descanso_s": 45, "hombro": "ok", "nota": ""},
+    {"match_id": "dead_bug", "nombre": "Dead bug", "tipo": "r", "series": 3, "reps_min": 10, "reps_max": 10, "segundos": null, "peso_kg": null, "descanso_s": 45, "hombro": "ok", "nota": ""},
+    {"match_id": null, "nombre": "Fondos en silla", "tipo": "bw", "series": 3, "reps_min": 8, "reps_max": 8, "segundos": null, "peso_kg": null, "descanso_s": 60, "hombro": "care", "nota": ""},
+    {"match_id": null, "nombre": "Hollow hold", "tipo": "t", "series": 3, "reps_min": null, "reps_max": null, "segundos": 20, "peso_kg": null, "descanso_s": 45, "hombro": "ok", "nota": ""}
+  ],
+  "dudas": ["No aparece el descanso de las zancadas."]
+}

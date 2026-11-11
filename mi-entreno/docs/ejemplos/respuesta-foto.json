@@ -1,0 +1,14 @@
+{
+  "nombre": "Rutina hombro (kine)",
+  "notas": "Lunes, miércoles y viernes. Hielo 10 minutos si duele.",
+  "ejercicios": [
+    {"match_id": "rot_ext", "nombre": "Rotación externa con mancuerna", "tipo": "wr", "series": 3, "reps_min": 15, "reps_max": 15, "segundos": null, "peso_kg": 2, "descanso_s": 45, "hombro": "ok", "nota": "por lado"},
+    {"match_id": "row1", "nombre": "Remo a una mano", "tipo": "wr", "series": 3, "reps_min": 10, "reps_max": 12, "segundos": null, "peso_kg": 6, "descanso_s": 90, "hombro": "ok", "nota": ""},
+    {"match_id": null, "nombre": "Face pull con banda", "tipo": "r", "series": 3, "reps_min": 15, "reps_max": 15, "segundos": null, "peso_kg": null, "descanso_s": 60, "hombro": "ok", "nota": "con banda elástica"},
+    {"match_id": "plank", "nombre": "Plancha", "tipo": "t", "series": 3, "reps_min": null, "reps_max": null, "segundos": 30, "peso_kg": null, "descanso_s": null, "hombro": "ok", "nota": ""}
+  ],
+  "dudas": [
+    "El press militar aparece marcado como \"todavía NO\", así que no lo incluí.",
+    "No se lee el descanso de la plancha."
+  ]
+}
