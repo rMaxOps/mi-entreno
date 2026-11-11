@@ -1,9 +1,10 @@
 /* Service worker de Mi Entreno: guarda la app para que funcione sin internet.
    Al cambiar archivos de la app, sube el número de CACHE para que el celular baje la versión nueva. */
-const CACHE = 'mi-entreno-v3';
+const CACHE = 'mi-entreno-v4';
 const ASSETS = [
   './',
   './index.html',
+  './js/rutina.js',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
