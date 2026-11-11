@@ -6,13 +6,13 @@ import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 
-const URL = 'https://vcyfdsworbuzoliuwpwo.supabase.co';           // mi-entreno-pruebas (NUNCA producción)
+const SUPA_URL = 'https://vcyfdsworbuzoliuwpwo.supabase.co';           // mi-entreno-pruebas (NUNCA producción)
 const KEY = 'sb_publishable_DvGsn814Zx97sqB81mhBpQ_zqMQ9OeX';
 
 const env = Object.fromEntries(readFileSync(new URL('./.env', import.meta.url), 'utf8')
   .split('\n').filter(l => l.includes('=') && !l.startsWith('#')).map(l => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()]));
 
-const cliente = () => createClient(URL, KEY, { auth: { persistSession: false, autoRefreshToken: false } });
+const cliente = () => createClient(SUPA_URL, KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 let ok = 0, mal = 0;
 const check = (nombre, cond, extra = '') => { cond ? ok++ : mal++; console.log(`${cond ? '✓' : '✗'} ${nombre}${!cond && extra ? '  → ' + extra : ''}`); };
 
