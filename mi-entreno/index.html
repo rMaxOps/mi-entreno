@@ -37,6 +37,8 @@
   --ok-soft:rgba(63,208,143,.14);--warn-soft:rgba(246,185,62,.14);--bad-soft:rgba(255,95,95,.14);--care-soft:rgba(255,159,90,.14);
   /* series de gráficos (paleta validada para daltonismo) */
   --c1:#3987e5;--c2:#d95926;--c3:#199e70;
+  /* personajes */
+  --fig:#eef1f6;--fig-ink:#0d0f14;--prop:#4a5263;--prop2:#6b7487;
   /* tipografía */
   --f-num:"Barlow Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
   --f-txt:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -55,6 +57,7 @@
     --ac:#c8f53a;--ac-tx:#4a6600;--ac-ink:#11141a;--ac-soft:rgba(110,150,0,.12);--ac-line:rgba(90,125,0,.5);
     --ok:#14935a;--warn:#a86a00;--bad:#d93636;--care:#b85400;--on-pain:#ffffff;
     --c1:#2a78d6;--c2:#eb6834;--c3:#1baf7a;
+    --fig:#2a2f3a;--fig-ink:#ffffff;--prop:#b9c0cc;--prop2:#8f98a8;
     --shadow:0 16px 40px rgba(20,25,40,.18);
     color-scheme:light;
   }
@@ -65,6 +68,7 @@
   --ac:#c8f53a;--ac-tx:#4a6600;--ac-ink:#11141a;--ac-soft:rgba(110,150,0,.12);--ac-line:rgba(90,125,0,.5);
   --ok:#14935a;--warn:#a86a00;--bad:#d93636;--care:#b85400;--on-pain:#ffffff;
   --c1:#2a78d6;--c2:#eb6834;--c3:#1baf7a;
+  --fig:#2a2f3a;--fig-ink:#ffffff;--prop:#b9c0cc;--prop2:#8f98a8;
   --shadow:0 16px 40px rgba(20,25,40,.18);
   color-scheme:light;
 }
@@ -310,6 +314,21 @@ ol.howto li::before{content:counter(st);position:absolute;left:0;top:-1px;width:
 .pill.na{background:var(--s3);color:var(--mu)}
 .light{display:flex;gap:14px;align-items:center}
 .light .lamp{width:46px;height:46px;border-radius:50%;flex:none;box-shadow:0 0 22px currentColor}
+/* ---------- Personajes ---------- */
+.pj-stage{margin:2px 0 12px}
+.pj-fig{display:flex;justify-content:center;align-items:flex-end;gap:6px;background:linear-gradient(180deg,var(--s2),transparent);border-radius:12px;padding:6px 6px 0;min-height:126px}
+.pj-fig svg{height:120px;width:auto;max-width:100%}
+.pj-fig.rm svg{height:100px;max-width:45%}
+.pj-fig .pj-side svg{height:76px}
+.pj-arrow{color:var(--mu);align-self:center}
+.bubble{position:relative;background:var(--s3);border-radius:14px;padding:10px 12px;margin-top:10px;font-size:15px;line-height:1.4}
+.bubble::before{content:"";position:absolute;left:22px;top:-6px;width:12px;height:12px;background:var(--s3);transform:rotate(45deg);border-radius:2px}
+.bubble small{display:block;font-size:12px;font-weight:600;margin-bottom:2px}
+.pj-row{display:flex;gap:10px;align-items:center}
+.pj-row > svg{height:86px;width:auto;flex:none}
+.pj-row .bubble{flex:1;margin:0}
+.pj-row .bubble::before{left:-5px;top:50%;margin-top:-6px}
+.card .pj-row{margin-top:12px}
 
 /* ---------- Movimiento ---------- */
 /* ---------- Rutina desde foto o PDF ---------- */
@@ -374,6 +393,9 @@ ol.howto li::before{content:counter(st);position:absolute;left:0;top:-1px;width:
 <div id="toast" class="toast" role="status"></div>
 <input type="file" id="imp-file" accept="application/json,.json" hidden>
 
+<script src="js/animaciones.js"></script>
+<script src="js/dialogos.js"></script>
+<script src="js/personajes.js"></script>
 <script>
 'use strict';
 /* =========================================================
@@ -997,6 +1019,42 @@ function chartTouch(e) {
 document.addEventListener('pointerdown', chartTouch);
 document.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'mouse') chartTouch(e); });
 
+/* ---------- Personajes (js/personajes.js) ---------- */
+/* Escenario del ejercicio: el personaje de su grupo haciéndolo y su globo.
+   Si el Coach da un aviso de dolor, aparece él serio en vez de la animación. */
+function pjStage(ex, say) {
+  if (typeof pjExercise !== 'function') return '';
+  const rm = pjReduced(), who = charOf(ex), serio = !!(say && say.mood === 'serio');
+  const fig = serio ? pjStill(say.who, 'serio')
+    : pjExercise(ex, rm) + (say && say.who !== who ? `<span class="pj-side">${pjStill(say.who, say.mood)}</span>` : '');
+  const bub = say ? pjBubble(say.who, esc(say.text)) : pjBubble(who, esc(pjFrase(ex)));
+  return `<div class="pj-stage"><div class="pj-fig ${rm && !serio ? 'rm' : ''}">${fig}</div>${bub}</div>`;
+}
+/* Quién presenta una rutina: el personaje del grupo que más se repite */
+function leadOf(t, items) {
+  if (INTRO_RUTINA[t.id]) return INTRO_RUTINA[t.id].who;
+  const n = {}; (items || []).forEach(i => { const w = charOf(getEx(i.ex)); n[w] = (n[w] || 0) + 1; });
+  return Object.keys(n).sort((a, b) => n[b] - n[a])[0] || 'coach';
+}
+/* El Coach en el check-in: serio con dolor alto. La frase se guarda para que no cambie en cada toque. */
+function checkinCoach(c, lv) {
+  if (typeof pjStill !== 'function') return '';
+  if (!c.say || c.say.lv !== lv) c.say = { lv, text: decir('coach', 'checkin_' + lv) };
+  return `<div class="pj-row">${pjStill('coach', lv === 'r' ? 'serio' : '')}${pjBubble('coach', esc(c.say.text))}</div>`;
+}
+/* Lo que dicen los personajes después de registrar una serie */
+function reactToSet(it, ex, p, record, alert) {
+  if (typeof decir !== 'function') return;
+  const d = S.draft, total = d.items.reduce((n, i) => n + i.sets, 0), done = d.items.reduce((n, i) => n + Math.min(i.done.length, i.sets), 0);
+  const open = d.items.find(i => i.open) || it, wo = charOf(getEx(open.ex)), we = charOf(ex);
+  let say = null;
+  if (p >= 5) say = { uid: it.uid, who: 'coach', mood: 'serio', text: decir('coach', 'dolor_alto') };
+  else if (record && !alert && p <= 2) say = { uid: it.uid, who: we, text: decir(we, 'record') };
+  else if (total - done === 1) say = { uid: open.uid, who: wo, text: decir(wo, 'ultima') };
+  else if (total > 3 && done === Math.ceil(total / 2)) say = { uid: open.uid, who: wo, text: decir(wo, 'mitad') };
+  if (say) d.say = say;
+}
+
 /* ---------- Componentes ---------- */
 /* Stepper: número grande arriba y botones − / + abajo. "pop" anima el número que acaba de cambiar. */
 function stepper(label, valHtml, act, attrs, pop = false) {
@@ -1048,7 +1106,7 @@ function guideModal(id, from) {
     : '<button class="btn pri big" data-act="modal-close">Cerrar</button>';
   openModal(`<div class="row between"><h2 class="mb0">${esc(ex.name)}</h2>${shoulderBadge(ex)}</div>
     <p class="tiny muted">${esc(ex.group)} · ${esc(TYPES[ex.type] || '')} · meta ${esc(ex.goal)}${ex.type === 't' ? ' s' : ''}</p>
-    ${guideHtml(ex)}<div class="row mt2">${back}</div>`);
+    ${pjStage(ex)}${guideHtml(ex)}<div class="row mt2">${back}</div>`);
 }
 const sideTxt = () => ({ izq: 'izquierdo', der: 'derecho', ambos: '(ambos)' })[S.settings.side] || '';
 
@@ -1077,6 +1135,7 @@ function render() {
   view.classList.remove('enter');
   if (UI.enter) { void view.offsetWidth; view.classList.add('enter'); UI.enter = false; }
   UI.pop = null;
+  if (typeof pjObserve === 'function') pjObserve();
   document.documentElement.style.setProperty('--toph', $('.top').offsetHeight + 'px');
   tickChrono();
 }
@@ -1172,6 +1231,7 @@ function vPick() {
   if (c.withRehab == null) c.withRehab = !!rec.withRehab;
   const list = allTpl().slice().sort((a, b) => (b.id === rec.id) - (a.id === rec.id));
   let h = `<div class="card ${lv}"><div class="light"><div class="lamp bg-${lv}" style="color:${pColor(p)}"></div><div><b>Semáforo ${L[0]} · dolor ${p}/10</b><div class="small">${L[1]}</div></div></div>
+    ${checkinCoach(c, lv)}
     <div class="row mt"><button class="link" data-act="ci-back">← Cambiar check-in</button></div></div>`;
   h += `<div class="note ${lv === 'r' ? 'bad' : 'info'}"><b>Recomendada hoy:</b> ${esc(getTpl(rec.id).name)}<div class="small">${esc(rec.why)}</div></div>`;
   h += `<button class="tog ${c.withRehab ? 'on' : ''}" data-act="ci-rehab"><span><b>Incluir Rehab al inicio</b><div class="muted small">Agrega los 5 ejercicios de Rehab antes de la rutina.</div></span><span class="sw"></span></button>`;
@@ -1219,6 +1279,12 @@ function startSession(tplId) {
     banner: banner.join(' '), notes: '', rest: null, items: [] };
   items.forEach(i => S.draft.items.push(newItem(i, yellow)));
   if (S.draft.items[0]) S.draft.items[0].open = true;
+  if (typeof decir === 'function') {
+    const lead = leadOf(t, S.draft.items);
+    S.draft.intro = INTRO_RUTINA[t.id] || { who: lead, text: decir(lead, 'presentar') };
+    const f0 = S.draft.items[0];
+    if (f0) { const w0 = charOf(getEx(f0.ex)); S.draft.say = { uid: f0.uid, who: w0, text: decir(w0, 'primero') }; }
+  }
   UI.ci = null; save(); updateWakeLock(); render(); window.scrollTo(0, 0);
   toast('¡Entreno iniciado! Parte con el calentamiento.', 'ok');
 }
@@ -1239,6 +1305,7 @@ function vSession() {
       <div class="sesprog" role="progressbar" aria-label="Series hechas" aria-valuemin="0" aria-valuemax="${totalSets}" aria-valuenow="${doneSets}"><i style="width:${totalSets ? doneSets / totalSets * 100 : 0}%"></i></div></div>
     <button class="btn okb sm" data-act="finish">Terminar</button></div>`;
   if (d.banner) h += `<div class="note warn small">${esc(d.banner)}</div>`;
+  if (d.intro && !doneSets && typeof pjStill === 'function') h += `<div class="card"><div class="pj-row" style="margin:0">${pjStill(d.intro.who)}${pjBubble(d.intro.who, esc(d.intro.text))}</div></div>`;
   h += `<div class="card"><button class="row between" style="width:100%;background:none;border:0;padding:0;cursor:pointer" data-act="wu-open">
       <h2 class="mb0">Calentamiento</h2><span class="badge ${wd === WARMUP.length ? 'ok' : ''}">${wd}/${WARMUP.length} ${d.warmOpen ? '▴' : '▾'}</span></button>
     ${d.warmOpen ? `<div class="mt">${WARMUP.map((w, i) => `<button class="chk ${d.warmup[i] ? 'on' : ''}" data-act="wu" data-i="${i}"><span class="box">${d.warmup[i] ? '✓' : ''}</span><span>${esc(w)}</span></button>`).join('')}</div>` : ''}</div>`;
@@ -1258,6 +1325,7 @@ function vItem(it, idx) {
   if (!it.open) return `<div class="ex ${full ? 'done' : ''}">${head}</div>`;
   const last = lastFor(ex.id), sg = suggest(ex, it);
   let b = '';
+  b += pjStage(ex, d.say && d.say.uid === it.uid ? d.say : null);
   if (it.note) b += `<p class="small muted"><i>${esc(it.note)}</i></p>`;
   b += `<p class="small"><span class="muted">Última vez:</span> ${last ? `<b>${last.sets.map(s => fmtSet(ex, s)).join(' · ')}</b> <span class="muted tiny">(${relDay(last.s.start)}${ex.type === 'bw' ? ', reps' : ex.type === 'wr' ? ', kg×reps' : ''})</span>` : '<span class="muted">sin registros</span>'}</p>`;
   b += `<div class="note ${sg.tone} small">💡 ${esc(sg.text)}</div>`;
@@ -1307,6 +1375,7 @@ function logSet(u) {
     it.open = false; S.draft.items[idx + 1].open = true;
     toast(`¡${getEx(it.ex).name} listo! Sigue: ${getEx(S.draft.items[idx + 1].ex).name}`, 'ok');
   }
+  reactToSet(it, ex, p, record, msgs.length > 0);
   startRest(it.rest || S.settings.rest, ex.name);
   save(); render();
 }
@@ -1325,6 +1394,7 @@ function vFinish() {
 }
 function finishSave() {
   const d = S.draft, f = UI.finishing;
+  const lead = typeof decir === 'function' ? (d.intro ? d.intro.who : leadOf(getTpl(d.tplId) || {}, d.items)) : null;
   const sess = { id: d.id, start: d.start, end: Date.now(), tplId: d.tplId, tplName: d.tplName, phase: d.phase, withRehab: d.withRehab,
     checkin: d.checkin, warmup: d.warmup.slice(), painEnd: f.pain, notes: (f.notes || '').trim(), nextDay: null,
     items: d.items.filter(i => i.done.length).map(i => ({ ex: i.ex, sets: i.sets, goal: i.goal, rest: i.rest, done: i.done })) };
@@ -1332,7 +1402,7 @@ function finishSave() {
   stopRest(); updateWakeLock(); UI.tab = 'historial'; UI.histOpen = { [sess.id]: true }; render(); window.scrollTo(0, 0);
   const up = sess.painEnd - preOf(sess);
   confetti(); vibrate([40, 60, 40]);
-  openModal(`<h2>¡Entreno guardado! 💪</h2>
+  openModal(`<h2>¡Entreno guardado! 💪</h2>${lead ? `<div class="pj-row">${pjStill(lead)}${pjBubble(lead, esc(decir(lead, 'final')))}</div>` : ''}
     <div class="grid2 mt">
       <div class="stat"><b>${Math.max(1, Math.round((sess.end - sess.start) / 60000))}</b><span>minutos</span></div>
       <div class="stat"><b>${setsOf(sess)}</b><span>series</span></div>
@@ -1478,6 +1548,7 @@ function vMas() {
 /* ---------- Modales (sin alert/confirm del navegador) ---------- */
 function openModal(html) {
   $('#modal-root').innerHTML = `<div class="modal" data-act="modal-bg"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;
+  if (typeof pjObserve === 'function') pjObserve();
 }
 function closeModal() { $('#modal-root').innerHTML = ''; UI.confirmFn = null; }
 function ask(title, text, okLabel, fn, danger = true) {

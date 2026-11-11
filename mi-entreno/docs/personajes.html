@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elenco de Mi Entreno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Mismos colores que la app (diseño Lima Nocturna) */
+:root{
+  --bg:#0d0f14;--s1:#161a22;--s2:#1c2029;--s3:#262b36;--line:#232835;--tx:#f2f4f8;--mu:#8d95a7;
+  --ac:#c8f53a;--ac-tx:#c8f53a;--ac-ink:#0d0f14;
+  --fig:#eef1f6;--fig-ink:#0d0f14;--prop:#4a5263;--prop2:#6b7487;
+  --f-num:"Barlow Condensed","Arial Narrow",sans-serif;--f-txt:Inter,system-ui,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    --bg:#f3f4f7;--s1:#fff;--s2:#f0f2f6;--s3:#e2e6ed;--line:#e1e4ea;--tx:#11141a;--mu:#5a6273;
+    --ac-tx:#4a6600;--fig:#2a2f3a;--fig-ink:#ffffff;--prop:#b9c0cc;--prop2:#8f98a8;color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f3f4f7;--s1:#fff;--s2:#f0f2f6;--s3:#e2e6ed;--line:#e1e4ea;--tx:#11141a;--mu:#5a6273;
+  --ac-tx:#4a6600;--fig:#2a2f3a;--fig-ink:#ffffff;--prop:#b9c0cc;--prop2:#8f98a8;color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 var(--f-txt);padding:24px 16px 48px}
+main{max-width:640px;margin:0 auto}
+h1{font:700 36px/1 var(--f-num);margin:0 0 8px}
+h2{font:700 26px/1.1 var(--f-num);margin:36px 0 6px}
+p.lead,.mu{color:var(--mu)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.toolbar button{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--s2);color:var(--tx);font-weight:600;cursor:pointer}
+.toolbar button.on{background:var(--ac);color:var(--ac-ink);border-color:var(--ac)}
+.cast{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.who{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.who svg{height:130px;width:auto}
+.who b{font:700 22px var(--f-num);margin-top:4px}
+.who .g{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.who .d{font-size:13.5px;color:var(--mu);margin-top:4px}
+.who .bubble{text-align:left;width:100%}
+.demo{background:var(--s1);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:12px 0}
+.stage{position:relative;background:linear-gradient(180deg,var(--s2),var(--s1));display:flex;justify-content:center;align-items:center;gap:6px;padding:10px 8px 4px;min-height:140px}
+.stage svg{height:120px;width:auto;max-width:100%}
+.stage.rm svg{height:100px;max-width:45%}
+.demo .body{padding:10px 16px 14px}
+.demo .body b{font:700 22px/1.05 var(--f-num)}
+.bubble{position:relative;background:var(--s3);border-radius:14px;padding:10px 12px;margin-top:10px;font-size:15px}
+.bubble::before{content:"";position:absolute;left:22px;top:-7px;width:14px;height:14px;background:var(--s3);transform:rotate(45deg);border-radius:2px}
+.bubble small{display:block;color:var(--mu);font-size:12px;margin-bottom:2px}
+.tip{font-size:13.5px;color:var(--mu);margin-top:8px}
+.tip b{font:600 13.5px var(--f-txt);color:var(--tx)}
+.pj-arrow{color:var(--mu)}
+</style>
+<script src="../js/animaciones.js"></script>
+<script src="../js/dialogos.js"></script>
+<script src="../js/personajes.js"></script>
+</head>
+<body>
+<main>
+  <h1>El elenco de Mi Entreno</h1>
+  <p class="lead">Hoja de revisión de los personajes: el elenco y la animación de cada ejercicio de la biblioteca, con el tip de la guía al lado para comprobar que la técnica coincide.</p>
+  <div class="toolbar" role="group" aria-label="Opciones de vista">
+    <button id="t-theme" type="button">Cambiar tema claro/oscuro</button>
+    <button id="t-rm" type="button" aria-pressed="false">Ver como “menos movimiento”</button>
+  </div>
+  <h2>Los 5 personajes</h2>
+  <div class="cast" id="cast"></div>
+  <div id="demos"></div>
+</main>
+<script>
+'use strict';
+/* Lista de ejercicios de docs/especificacion.md (id, nombre, grupo, tip) */
+const EJ = [
+  ['rot_ext', 'Rotación externa con mancuerna', 'Rehab hombro', 'Acostado de lado, codo pegado al cuerpo con una toalla doblada. Peso muy liviano, 2-3 s por rep.'],
+  ['scap_pull', 'Retracciones escapulares en barra', 'Rehab hombro', 'Colgado con brazos estirados, baja y junta las escápulas sin doblar los codos. Pausa 1 s.'],
+  ['ytw', 'Y-T-W boca abajo', 'Rehab hombro', 'Sin peso o con 1 kg. Pulgares hacia arriba, lento. Cada letra cuenta como 1 rep.'],
+  ['wall_slide', 'Deslizamientos en pared', 'Rehab hombro', 'Antebrazos contra la pared, sube solo hasta donde no haya dolor.'],
+  ['dead_hang', 'Colgado en barra', 'Rehab hombro', 'Empieza con los pies apoyados para descargar peso. Hombros activos, no colgado flojo.'],
+  ['pullup', 'Dominadas pronas', 'Tirón', 'Agarre al ancho de hombros. Si molesta, cambia a supinas. Sin balanceo.'],
+  ['chinup', 'Dominadas supinas', 'Tirón', 'Palmas hacia ti; suele ser más amable con el hombro.'],
+  ['negative', 'Dominadas negativas', 'Tirón', 'Sube con un salto o una silla y baja en 3-5 s. Detente si duele en la parte baja.'],
+  ['row1', 'Remo a una mano', 'Tirón', 'Apoyo en banco o silla, lleva el codo hacia la cadera. Reps por brazo.'],
+  ['rear_fly', 'Pájaros (aperturas inversas)', 'Tirón', 'Torso inclinado, peso liviano, junta las escápulas.'],
+  ['curl', 'Curl de bíceps', 'Tirón', 'Codos quietos a los costados.'],
+  ['hammer', 'Curl martillo', 'Tirón', 'Agarre neutro, sin balanceo.'],
+  ['floor_press', 'Press de pecho en el suelo', 'Empuje', 'El suelo limita el recorrido y protege el hombro. Codos a unos 45°.'],
+  ['pushup', 'Flexiones', 'Empuje', 'Si molesta, hazlas inclinado con las manos en una mesa. Codos a 45°.'],
+  ['neutral_press', 'Press de hombro agarre neutro', 'Empuje', 'Sentado, palmas enfrentadas. Solo si levantar el brazo sobre la cabeza no duele.'],
+  ['lateral', 'Elevaciones laterales', 'Empuje', 'Hasta la altura del hombro, brazos un poco hacia adelante (plano escapular).'],
+  ['kickback', 'Patada de tríceps', 'Empuje', 'Brazo pegado al cuerpo, mueve solo el codo.'],
+  ['goblet', 'Sentadilla goblet', 'Piernas', 'Mancuerna pegada al pecho, espalda recta.'],
+  ['rdl', 'Peso muerto rumano', 'Piernas', 'Cadera atrás, mancuernas cerca de las piernas, espalda neutra.'],
+  ['lunge', 'Zancadas', 'Piernas', 'Reps por pierna. Rodilla alineada con el pie.'],
+  ['bridge', 'Puente de glúteo', 'Piernas', 'Mancuerna sobre la cadera, aprieta arriba 1 s.'],
+  ['calf', 'Elevación de talones', 'Piernas', 'Pausa arriba y abajo.'],
+  ['dead_bug', 'Dead bug', 'Core', 'Zona lumbar pegada al suelo todo el tiempo.'],
+  ['plank', 'Plancha', 'Core', 'Sobre antebrazos. Si molesta el hombro, apoya las rodillas.'],
+  ['knee_raise', 'Elevación de rodillas colgado', 'Core', 'Requiere colgarse: solo si el colgado no duele.'],
+].map(([id, name, group, tip]) => ({ id, name, group, tip }));
+
+document.getElementById('cast').innerHTML = Object.entries(CAST).map(([k, c]) => `<div class="who"><span class="g">${c.group}</span>${pjStill(k)}
+  <b style="color:${charInk(k)}">${c.name}</b><span class="d">${c.desc}</span>${pjBubble(k, DIALOGOS[k].presentar[0])}</div>`).join('') +
+  `<div class="who"><span class="g">Aviso de dolor</span>${pjStill('coach', 'serio')}<b style="color:${charInk('coach')}">Coach serio</b>${pjBubble('coach', DIALOGOS.coach.dolor_alto[0])}</div>`;
+
+function demos(rm) {
+  let h = '', g = '';
+  EJ.forEach(ex => {
+    if (ex.group !== g) { g = ex.group; h += `<h2>${g}</h2>`; }
+    h += `<div class="demo" id="d-${ex.id}"><div class="stage ${rm ? 'rm' : ''}">${pjExercise(ex, rm)}</div><div class="body"><b>${ex.name}</b>
+      ${pjBubble(charOf(ex), pjFrase(ex))}<div class="tip"><b>Tip de la guía:</b> ${ex.tip}</div></div></div>`;
+  });
+  document.getElementById('demos').innerHTML = h;
+  pjObserve();
+}
+let rm = pjReduced();
+demos(rm);
+const bRm = document.getElementById('t-rm');
+bRm.classList.toggle('on', rm); bRm.setAttribute('aria-pressed', rm);
+bRm.onclick = () => { rm = !rm; bRm.classList.toggle('on', rm); bRm.setAttribute('aria-pressed', rm); demos(rm); };
+document.getElementById('t-theme').onclick = () => {
+  const root = document.documentElement, dark = getComputedStyle(root).colorScheme.includes('dark');
+  root.dataset.theme = dark ? 'light' : 'dark';
+};
+</script>
+</body>
+</html>
