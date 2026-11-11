@@ -1,6 +1,6 @@
 /* Service worker de Mi Entreno: guarda la app para que funcione sin internet.
    Al cambiar archivos de la app, sube el número de CACHE para que el celular baje la versión nueva. */
-const CACHE = 'mi-entreno-v8';
+const CACHE = 'mi-entreno-v9';
 const ASSETS = [
   './',
   './index.html',
@@ -14,7 +14,11 @@ const ASSETS = [
   './js/logica/fases.js',
   './js/logica/progresion.js',
   './js/logica/respaldo.js',
+  './js/config.js',
   './js/main.js',
+  './js/nube/cliente.js',
+  './js/nube/cuenta.js',
+  './js/nube/sync.js',
   './js/personajes.js',
   './js/registro.js',
   './js/rutina.js',
@@ -54,7 +58,8 @@ self.addEventListener('activate', e => {
 });
 
 /* Responde rápido desde la caché y, en paralelo, busca la versión nueva en internet. */
-const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
+/* Fuentes de Google y supabase-js (versión fija en el CDN): se guardan para usarse sin internet */
+const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdn.jsdelivr.net'];
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
