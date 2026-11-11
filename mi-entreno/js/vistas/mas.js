@@ -3,7 +3,7 @@ import { cuentaCard } from '../nube/cuenta.js';
 import { GROUPS, PHASES, TYPES } from '../datos/catalogo.js';
 import { APP_VERSION, S } from '../estado.js';
 import { allEx } from '../logica/ejercicios.js';
-import { aiSettingsCard, importButton } from '../rutina.js';
+import { importButton } from '../rutina.js';
 import { shoulderBadge } from '../ui/componentes.js';
 import { installCard } from '../ui/pwa.js';
 import { esc, kg, plural } from '../util.js';
@@ -38,7 +38,6 @@ export function vMas() {
     <div class="mt">${typeof importButton === 'function' ? importButton() : ''}</div>
     ${S.templates.length ? `<div class="mt">${S.templates.map(t => `<div class="list-row"><span class="grow"><b>${esc(t.name)}</b><div class="tiny muted">${plural(t.items.length, 'ejercicio', 'ejercicios')}</div></span><button class="btn sm" data-act="tpl-edit" data-id="${t.id}">Editar</button><button class="btn sm danger icon" data-act="tpl-del" data-id="${t.id}" aria-label="Borrar plantilla">✕</button></div>`).join('')}</div>` : '<p class="muted small">Aún no tienes plantillas propias. Puedes crearlas aquí o guardar una sesión como plantilla.</p>'}</div>`;
   const mine = S.exercises.filter(e => !e.hidden);
-  if (typeof aiSettingsCard === 'function') h += aiSettingsCard();
   h += `<div class="card"><div class="row between"><h2 class="mb0">Mis ejercicios</h2><button class="btn sm" data-act="ex-new">+ Nuevo</button></div>
     ${mine.length ? `<div class="mt">${mine.map(e => `<div class="list-row"><span class="grow"><b>${esc(e.name)}</b> ${shoulderBadge(e)}<div class="tiny muted">${esc(e.group)} · ${esc(TYPES[e.type])} · meta ${esc(e.goal)}</div></span><button class="btn sm" data-act="ex-edit" data-id="${e.id}">Editar</button></div>`).join('')}</div>` : '<p class="muted small">Crea ejercicios propios con nombre, grupo, tipo, etiqueta de hombro, meta y tip.</p>'}</div>`;
   h += `<div class="card"><h2>Respaldo</h2><p class="muted small">Tus datos viven solo en este teléfono. Descarga un respaldo de vez en cuando.</p>
