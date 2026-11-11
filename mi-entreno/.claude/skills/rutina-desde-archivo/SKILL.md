@@ -5,6 +5,11 @@ description: Cómo implementar en Mi Entreno la función de subir una foto o un 
 
 # Crear una rutina desde una foto o un PDF
 
+> **En pausa (decisión del dueño):** la lectura con IA (foto, PDF y API key en el teléfono) se quitó para no
+> generar costos. Hoy la app solo tiene "pegar el texto", que se lee en el teléfono sin IA (`js/rutina.js`).
+> Cuando se retome (etapa 6), la llamada va en una Supabase Edge Function con la key como secreto del servidor,
+> límite de lecturas por persona y sin guardar el archivo. Las rutinas y respuestas de ejemplo siguen en `docs/ejemplos/`.
+
 ## Flujo para el usuario
 1. En "Entreno", el botón **"📷 Crear rutina desde foto o PDF"** abre `<input type="file" accept="image/*,application/pdf" capture="environment">`, para sacar la foto con la cámara o elegir un archivo.
 2. Se ve una vista previa del archivo y un indicador de "Leyendo tu rutina…".

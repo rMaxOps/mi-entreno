@@ -33,7 +33,8 @@ Responde y escribe la interfaz siempre en **español de Chile**.
 ## Skills del proyecto
 - `diseno-mi-entreno`: cualquier pantalla, componente o estilo.
 - `personajes-animados`: personajes, animaciones y diálogos.
-- `rutina-desde-archivo`: leer rutinas desde foto, PDF o texto.
+- `rutina-desde-archivo`: leer rutinas desde foto, PDF o texto. **La lectura con IA (foto/PDF) está en pausa**
+  hasta la etapa 6 (Edge Function con la key en el servidor); hoy solo existe pegar el texto, que se lee sin IA.
 - `datos-y-privacidad`: Supabase, RLS, migraciones, sincronización y manejo de datos de salud.
   **Úsala siempre que toques datos, cuentas o la base.**
 
