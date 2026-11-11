@@ -1,0 +1,22 @@
+# ===== Secretos: NUNCA al repositorio =====
+# Variables de entorno y claves (las claves secretas viven en el panel de Supabase, no aquí)
+.env
+.env.*
+!.env.example
+**/supabase/.env
+**/supabase/functions/.env
+*.pem
+*.key
+*.p12
+credenciales*
+secrets*
+
+# Archivos locales de la CLI de Supabase (pueden tener datos del proyecto)
+**/supabase/.temp/
+**/supabase/.branches/
+
+# ===== Otros que no van al repo =====
+node_modules/
+.DS_Store
+Thumbs.db
+*.log

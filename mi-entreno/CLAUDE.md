@@ -55,6 +55,12 @@ Responde y escribe la interfaz siempre en **español de Chile**.
   - prueba a 390 px el flujo completo (check-in → sesión → guardar → historial → progreso) sin errores
     en la consola y, desde que hay cuentas, **con dos usuarios distintos** para confirmar que ninguno
     ve los datos del otro.
+- **Secretos fuera del repo (el repo es público):** solo pueden ir la Project URL y la clave pública
+  de Supabase. El resto (clave secreta/service_role, contraseña de la base, API key de Anthropic,
+  secretos de Google) vive en el panel de Supabase o en el gestor de contraseñas. El `.gitignore` excluye
+  `.env` y archivos de la CLI, y `.githooks/revisar-secretos.js` detiene cualquier commit con algo
+  que parezca un secreto. En cada computador nuevo actívalo con `git config core.hooksPath .githooks`.
+  GitHub además tiene activos el escaneo de secretos y el bloqueo al subir.
 - Trabaja en ramas `feat/...` (una por etapa), con commits pequeños y un PR por etapa.
   **Haz merge de cada etapa antes de empezar la siguiente** para evitar conflictos.
 - Antes de cada etapa, dime qué tengo que hacer yo (crear cosas en Supabase, secretos, etc.) con pasos simples.
