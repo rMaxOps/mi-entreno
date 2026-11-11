@@ -5,6 +5,8 @@ import './ui/graficos.js';
 import './ui/pwa.js';
 import './rutina.js';
 import { cuentaInicial, iniciarCuenta } from './nube/cuenta.js';
+import { onboardingPendiente, tieneDatos } from './logica/perfil.js';
+import { iniciarOnboarding } from './vistas/perfil.js';
 import { S, UI } from './estado.js';
 import { aplicarTextos, cargarTextos } from './i18n.js';
 import { pendingNextDay } from './logica/fases.js';
@@ -16,6 +18,7 @@ import { toast } from './ui/toast.js';
 function init() {
   aplicarTextos();
   cuentaInicial();          // si la última vez había una cuenta, abre su copia local (sirve sin internet)
+  if (onboardingPendiente() && !tieneDatos()) iniciarOnboarding();   // persona nueva: asistente de bienvenida
   applyTheme();
   if (window.matchMedia) matchMedia('(prefers-color-scheme: light)').addEventListener?.('change', applyTheme);
   UI.enter = true;

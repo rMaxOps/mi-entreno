@@ -15,7 +15,7 @@ import { beep3, restTick, stopRest, unlockAudio, updateWakeLock, vibrate } from 
 import { toast } from './toast.js';
 /* ---------- Acciones (clicks) ---------- */
 Object.assign(ACT, {
-  'tab': d => { UI.enter = UI.tab !== d.tab; UI.tab = d.tab; if (d.tab !== 'entreno') UI.finishing = null; render(); window.scrollTo(0, 0); },
+  'tab': d => { if (UI.pf && UI.pf.modo === 'editar') UI.pf = null; UI.enter = UI.tab !== d.tab; UI.tab = d.tab; if (d.tab !== 'entreno') UI.finishing = null; render(); window.scrollTo(0, 0); },
   'go-checkin': () => { UI.enter = true; UI.tab = 'entreno'; UI.ci = null; render(); window.scrollTo(0, 0); },
   'set-theme': d => { S.settings.theme = d.v; save(); applyTheme(); render(); },
   'ci-energy': d => { UI.ci.energy = +d.v; render(); },

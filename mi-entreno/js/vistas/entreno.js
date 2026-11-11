@@ -1,4 +1,6 @@
 /* Pantalla Entreno: check-in, elegir rutina y sesión. */
+import { t } from '../i18n.js';
+import { zonaDolor } from '../logica/perfil.js';
 import { ENERGY, ENERGY_TXT, WARMUP } from '../datos/catalogo.js';
 import { INTRO_RUTINA, decir } from '../dialogos.js';
 import { S, UI, save } from '../estado.js';
@@ -28,7 +30,7 @@ export function initCheckin() {
 export function vCheckin() {
   const c = UI.ci;
   return `<div class="card"><h2>Check-in antes de entrenar</h2>
-    <h3>Dolor de hombro ${esc(sideTxt())} ahora</h3>${painSlider('ci-pain', c.pain, 'Dolor de hombro antes de entrenar')}
+    <h3>${esc((zonaDolor() ? t('perfil.dolor_ahora', { zona: zonaDolor() }) : t('perfil.dolor_general')))}</h3>${painSlider('ci-pain', c.pain, (zonaDolor() ? t('perfil.dolor_ahora', { zona: zonaDolor() }) : t('perfil.dolor_general')))}
     <h3>Energía</h3><div class="emojis">${ENERGY.map((e, i) => `<button data-act="ci-energy" data-v="${i + 1}" class="${c.energy === i + 1 ? 'on' : ''}" aria-label="${ENERGY_TXT[i]}">${e}</button>`).join('')}</div>
     <p class="center muted small">${ENERGY_TXT[c.energy - 1]}</p>
     <h3>Horas de sueño anoche</h3><div class="steps">${stepper('Horas', `${n1(c.sleep)}<small>h</small>`, 'ci-sleep', '')}</div>

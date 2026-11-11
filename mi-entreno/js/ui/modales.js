@@ -1,4 +1,6 @@
 /* Hojas y diálogos dentro de la app (sin alert/confirm). */
+import { t } from '../i18n.js';
+import { zonaDolor } from '../logica/perfil.js';
 import { GROUPS, TYPES } from '../datos/catalogo.js';
 import { S, UI, save } from '../estado.js';
 import { allEx, getEx, preOf } from '../logica/ejercicios.js';
@@ -40,8 +42,8 @@ export function openLib(target) {
 export function ndModal(id) {
   const s = S.sessions.find(x => x.id === id); if (!s) return;
   UI.nd = { id, pain: preOf(s) };
-  openModal(`<h2>¿Cómo amaneció el hombro?</h2><p class="muted small">${esc(cap(fmtDate(s.start)))} hiciste ${esc(s.tplName)}. Antes de entrenar: ${preOf(s)}/10${s.painEnd != null ? `, al terminar: ${s.painEnd}/10` : ''}.</p>
-    ${painSlider('nd-pain', UI.nd.pain, 'Dolor de hombro al día siguiente')}
+  openModal(`<h2>${esc((zonaDolor() ? t('perfil.como_amanecio', { zona: zonaDolor() }) : t('perfil.como_amanecio_general')))}</h2><p class="muted small">${esc(cap(fmtDate(s.start)))} hiciste ${esc(s.tplName)}. Antes de entrenar: ${preOf(s)}/10${s.painEnd != null ? `, al terminar: ${s.painEnd}/10` : ''}.</p>
+    ${painSlider('nd-pain', UI.nd.pain, (zonaDolor() ? t('perfil.como_amanecio', { zona: zonaDolor() }) : t('perfil.como_amanecio_general')))}
     <button class="btn pri big mt" data-act="nd-save">Guardar</button><button class="btn block ghost mt" data-act="nd-skip">Ahora no</button>`);
 }
 export function tplEditor() {

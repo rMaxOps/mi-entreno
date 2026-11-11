@@ -1,4 +1,6 @@
 /* Terminar y guardar un entreno. */
+import { t } from '../i18n.js';
+import { zonaDolor } from '../logica/perfil.js';
 import { decir } from '../dialogos.js';
 import { S, UI, save } from '../estado.js';
 import { getTpl, preOf, setsOf, volumeOf } from '../logica/ejercicios.js';
@@ -14,7 +16,7 @@ export function vFinish() {
   const d = S.draft, f = UI.finishing;
   const nsets = d.items.reduce((n, i) => n + i.done.length, 0);
   return `<div class="card"><h2>Terminar entreno</h2><p class="muted small">${esc(d.tplName)} · ${durTxt(Date.now() - d.start)} · ${plural(nsets, 'serie', 'series')}</p>
-    <h3>Dolor de hombro ahora</h3>${painSlider('fin-pain', f.pain, 'Dolor al terminar')}
+    <h3>${esc((zonaDolor() ? t('perfil.dolor_terminar', { zona: zonaDolor() }) : t('perfil.dolor_terminar_general')))}</h3>${painSlider('fin-pain', f.pain, (zonaDolor() ? t('perfil.dolor_terminar', { zona: zonaDolor() }) : t('perfil.dolor_terminar_general')))}
     <p class="small muted">Antes de entrenar: ${d.checkin.pain}/10</p>
     <div class="field"><label for="fin-notes">Notas (opcional)</label><textarea class="inp" id="fin-notes" data-in="fin-notes" placeholder="¿Cómo te sentiste? ¿Algo que molestó?">${esc(f.notes)}</textarea></div>
     ${nsets ? '' : '<div class="note warn small">No registraste series. Se guardará igual con el check-in y el dolor.</div>'}

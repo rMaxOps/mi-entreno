@@ -5,6 +5,7 @@
    - Lo que se borra en la app se sube como "borrado" (deleted_at) para que los otros teléfonos lo sepan.
    Una sesión de entreno viaja junto con sus series y sus lecturas de dolor. */
 import { CUENTA_UID, S, save } from '../estado.js';
+import { molestiaPrincipal, perfil } from '../logica/perfil.js';
 import { HOOKS } from '../registro.js';
 import { nube } from './cliente.js';
 
@@ -30,14 +31,7 @@ export function meta(st = S) {
   for (const k of ['h', 'u', 'pend', 'tomb', 'cursor']) st.meta[k] = st.meta[k] || {};
   return st.meta;
 }
-/* Perfil local (molestias, equipo, nivel...). Se completa en la etapa 2. */
-export function perfil(st = S) {
-  st.profile = st.profile || {};
-  st.profile.conditions = st.profile.conditions || [];
-  st.profile.equipment = st.profile.equipment || [];
-  return st.profile;
-}
-const condicionPrincipal = st => (perfil(st).conditions.find(c => c.status !== 'antigua') || perfil(st).conditions[0] || null);
+const condicionPrincipal = st => molestiaPrincipal(st);
 
 /* ---------- Ids: con cuenta, todo usa UUID (se generan en el teléfono) ---------- */
 export function asegurarIds(st) {
@@ -99,7 +93,7 @@ function filas(st, uid, k) {
       settings: s, consent_at: o.consent_at, onboarded_at: o.onboarded_at }]];
   }
   if (tabla === 'conditions') return [['conditions', { ...base, id, zone: o.zone, zone_other: o.zone_other || null, side: o.side || 'na',
-    status: o.status || 'activa', since: o.since || null, notes: o.notes || null, bothers: o.bothers || [], threshold: o.threshold || 4 }]];
+    status: o.status || 'activa', since: o.since ? (o.since.length === 7 ? o.since + '-01' : o.since) : null, notes: o.notes || null, bothers: o.bothers || [], threshold: o.threshold || 4 }]];
   if (tabla === 'equipment') return [['equipment', { ...base, id, kind: o.kind, weights: o.weights || [], notes: o.notes || null }]];
   if (tabla === 'exercises') return [['exercises', { ...base, id, slug: o.id, name: o.name, grp: o.group || null, type: o.type || 'r',
     goal: o.goal || null, tip: o.tip || null, tags: { ...(o.tags || {}), shoulder: o.shoulder || 'ok' }, hidden: !!o.hidden }]];
@@ -244,7 +238,7 @@ async function bajar(c, uid) {
       m.u[k] = r.updated_at; marcar(k);
     }
   };
-  lista('conditions', p.conditions, x => x.id, r => ({ id: r.id, zone: r.zone, zone_other: r.zone_other, side: r.side, status: r.status, since: r.since, notes: r.notes, bothers: r.bothers || [], threshold: r.threshold }));
+  lista('conditions', p.conditions, x => x.id, r => ({ id: r.id, zone: r.zone, zone_other: r.zone_other, side: r.side, status: r.status, since: r.since ? String(r.since).slice(0, 7) : '', notes: r.notes, bothers: r.bothers || [], threshold: r.threshold }));
   lista('equipment', p.equipment, x => x.id, r => ({ id: r.id, kind: r.kind, weights: (r.weights || []).map(Number), notes: r.notes }));
   lista('exercises', st.exercises, x => x.uuid, r => ({ id: r.slug, uuid: r.id, name: r.name, group: r.grp, type: r.type, shoulder: (r.tags || {}).shoulder || 'ok', goal: r.goal, tip: r.tip, custom: true, hidden: r.hidden, tags: r.tags || {} }));
   lista('templates', st.templates, x => x.id, r => ({ id: r.id, name: r.name, desc: r.description, items: r.items || [] }));

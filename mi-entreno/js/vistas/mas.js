@@ -6,6 +6,7 @@ import { allEx } from '../logica/ejercicios.js';
 import { importButton } from '../rutina.js';
 import { shoulderBadge } from '../ui/componentes.js';
 import { installCard } from '../ui/pwa.js';
+import { perfilCard } from './perfil.js';
 import { esc, kg, plural } from '../util.js';
 import { rulesCard } from './inicio.js';
 /* Más / Ajustes */
@@ -16,14 +17,9 @@ export function vMas() {
   let h = cuentaCard() + installCard();
   h += `<div class="card"><h2>Apariencia</h2><div class="seg">${[['auto', 'Automático'], ['dark', 'Oscuro'], ['light', 'Claro']].map(([k, l]) => `<button class="${(st.theme || 'auto') === k ? 'on' : ''}" data-act="set-theme" data-v="${k}">${l}</button>`).join('')}</div>
     <p class="tiny muted">Automático sigue el modo claro u oscuro de tu teléfono.</p></div>`;
-  h += `<div class="card"><h2>Hombro lesionado</h2><div class="seg">${[['izq', 'Izquierdo'], ['der', 'Derecho'], ['ambos', 'Ambos']].map(([k, l]) => `<button class="${st.side === k ? 'on' : ''}" data-act="set-side" data-v="${k}">${l}</button>`).join('')}</div></div>`;
-  h += `<div class="card"><h2>Mis mancuernas</h2><p class="muted small">Solo estos pesos aparecen en los botones +/−.</p>
-    <div class="chips">${st.weights.slice().sort((a, b) => a - b).map(w => `<span class="chipx">${kg(w)} kg<button data-act="w-del" data-v="${w}" aria-label="Quitar ${kg(w)} kg">×</button></span>`).join('')}</div>
-    <div class="row"><input class="inp grow" id="w-new" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej: 7,5" aria-label="Nuevo peso en kg"><button class="btn" data-act="w-add">Agregar</button></div></div>`;
+  h += perfilCard();
   h += `<div class="card"><h2>Entrenamiento</h2>
     ${num('rest', 'Descanso por defecto', `${st.rest}<small>s</small>`, 'Si la plantilla no define uno.')}
-    ${num('perWeek', 'Entrenos por semana', st.perWeek, 'Tu meta semanal.')}
-    ${num('threshold', 'Umbral de alerta de dolor', st.threshold, 'Desde este dolor la app avisa.')}
     <button class="tog ${st.sound ? 'on' : ''}" data-act="set-tog" data-k="sound"><b>Sonido al terminar el descanso</b><span class="sw"></span></button>
     <button class="tog ${st.vibrate ? 'on' : ''}" data-act="set-tog" data-k="vibrate"><b>Vibración</b><span class="sw"></span></button>
     <button class="btn sm mt" data-act="test-beep">Probar sonido</button></div>`;

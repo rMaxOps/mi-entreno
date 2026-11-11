@@ -7,6 +7,7 @@ import { vEntreno } from '../vistas/entreno.js';
 import { vHistorial } from '../vistas/historial.js';
 import { vInicio } from '../vistas/inicio.js';
 import { vMas } from '../vistas/mas.js';
+import { vPerfilPantalla } from '../vistas/perfil.js';
 import { vProgreso } from '../vistas/progreso.js';
 import { tickChrono } from './temporizador.js';
 /* ---------- Vistas ---------- */
@@ -24,9 +25,12 @@ export function render() {
   });
   $('#tab-ind').style.setProperty('--i', TAB_ORDER.indexOf(UI.tab));
   $('#live').hidden = !S.draft;
-  $('#title').textContent = UI.tab === 'entreno' && S.draft ? S.draft.tplName : t('tabs.' + UI.tab);
+  /* Asistente de bienvenida o "Mi perfil": pantalla propia; durante el asistente no hay pestañas */
+  document.body.classList.toggle('sin-tabs', !!(UI.pf && UI.pf.modo === 'onb'));
+  $('#title').textContent = UI.pf ? t(UI.pf.modo === 'onb' ? 'perfil.bienvenida' : 'perfil.titulo')
+    : UI.tab === 'entreno' && S.draft ? S.draft.tplName : t('tabs.' + UI.tab);
   $('#top-extra').innerHTML = UI.tab !== 'entreno' && S.draft ? `<button class="btn pri top-live" data-act="tab" data-tab="entreno" aria-label="Volver al entreno en curso">● <span data-chrono>${hms(Date.now() - S.draft.start)}</span></button>` : '';
-  const v = { inicio: vInicio, entreno: vEntreno, historial: vHistorial, progreso: vProgreso, mas: vMas }[UI.tab];
+  const v = UI.pf ? vPerfilPantalla : { inicio: vInicio, entreno: vEntreno, historial: vHistorial, progreso: vProgreso, mas: vMas }[UI.tab];
   const view = $('#view');
   view.innerHTML = v();
   /* las tarjetas entran con un fade solo al cambiar de pantalla, no en cada toque */
