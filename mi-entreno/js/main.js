@@ -31,7 +31,10 @@ function init() {
   const pend = pendingNextDay();
   if (pend) ndModal(pend.id);
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-    window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => { /* sin modo offline */ }); });
+    /* La app arranca después de cargar los textos, así que la página puede haber terminado de cargar antes:
+       si ya cargó, se registra al tiro; si no, al terminar de cargar. (Antes a veces no se registraba.) */
+    const registrar = () => navigator.serviceWorker.register('sw.js').catch(() => { /* sin modo offline */ });
+    if (document.readyState === 'complete') registrar(); else window.addEventListener('load', registrar);
   }
 }
 /* Primero los textos (i18n/es.json) y después la app */
