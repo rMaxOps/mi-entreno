@@ -4,6 +4,7 @@ import './ui/acciones.js';
 import './ui/graficos.js';
 import './ui/pwa.js';
 import './rutina.js';
+import { cuentaInicial, iniciarCuenta } from './nube/cuenta.js';
 import { S, UI } from './estado.js';
 import { aplicarTextos, cargarTextos } from './i18n.js';
 import { pendingNextDay } from './logica/fases.js';
@@ -14,6 +15,7 @@ import { toast } from './ui/toast.js';
 /* ---------- Inicio de la app ---------- */
 function init() {
   aplicarTextos();
+  cuentaInicial();          // si la última vez había una cuenta, abre su copia local (sirve sin internet)
   applyTheme();
   if (window.matchMedia) matchMedia('(prefers-color-scheme: light)').addEventListener?.('change', applyTheme);
   UI.enter = true;
@@ -32,3 +34,4 @@ function init() {
 /* Primero los textos (i18n/es.json) y después la app */
 await cargarTextos();
 init();
+iniciarCuenta();            // después de dibujar: conecta con Supabase sin bloquear la app

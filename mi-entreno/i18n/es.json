@@ -9,5 +9,125 @@
     "historial": "Historial",
     "progreso": "Progreso",
     "mas": "Más"
+  },
+  "cuenta": {
+    "titulo": "Tu cuenta",
+    "invitado": "Estás usando Mi Entreno sin cuenta: tus datos viven solo en este teléfono. Con una cuenta se guardan en la nube y puedes usarlos en otro teléfono.",
+    "solo_invitados": "Solo pueden entrar las personas invitadas.",
+    "google": "Entrar con Google",
+    "o_correo": "o con tu correo",
+    "correo_ph": "tu@correo.com",
+    "enviar_enlace": "Enviarme un enlace",
+    "enviado": "Te enviamos un correo a {email}. Ábrelo en este teléfono y toca el enlace.",
+    "codigo_ayuda": "¿Te llegó un código? Escríbelo aquí:",
+    "codigo_ph": "Código",
+    "entrar_codigo": "Entrar con el código",
+    "conectado": "Conectado como {email}",
+    "sin_sesion": "Tu sesión venció. Vuelve a entrar para sincronizar (tus datos siguen en este teléfono).",
+    "sincronizar": "Sincronizar ahora",
+    "importar": "Importar los datos de este teléfono",
+    "salir": "Cerrar sesión",
+    "hola": "¡Listo! Entraste como {email}.",
+    "correo_invalido": "Escribe un correo válido.",
+    "no_invitado": "Ese correo no está invitado. Pídele a Max que te agregue.",
+    "espera": "Espera un minuto antes de pedir otro correo.",
+    "codigo_malo": "El código no es correcto o ya venció. Pide uno nuevo.",
+    "error_red": "No se pudo conectar. Revisa tu internet y reintenta.",
+    "salir_pendientes_titulo": "Hay cambios sin subir",
+    "salir_pendientes": "Hay {n} cambios que todavía no se suben a la nube. Si cierras sesión ahora, se borrarán de este teléfono.",
+    "salir_igual": "Cerrar sesión igual",
+    "salir_titulo": "¿Cerrar sesión?",
+    "salir_texto": "Tus datos quedan guardados en tu cuenta. En este teléfono se borrará la copia de tu cuenta y volverás al modo sin cuenta.",
+    "adios": "Cerraste sesión."
+  },
+  "sync": {
+    "al_dia": "✓ Todo sincronizado {hace}",
+    "subiendo": "Sincronizando…",
+    "pendientes": "{n} cambios por subir",
+    "sin_red": "Sin conexión: los cambios se subirán al volver internet.",
+    "error": "No se pudo sincronizar. Se reintentará solo.",
+    "nunca": "Aún no se sincroniza."
+  },
+  "importar": {
+    "titulo": "Trae tus datos a tu cuenta",
+    "resumen": "En este teléfono tienes {sesiones} entrenos, {plantillas} plantillas y {ejercicios} ejercicios propios. Revisa tu perfil y súbelos a tu cuenta.",
+    "molestia": "Molestia o lesión",
+    "sin_molestias": "No tengo molestias",
+    "zona": "Zona",
+    "lado": "Lado",
+    "estado": "Estado",
+    "umbral": "Avisarme desde dolor",
+    "molesta": "Me molesta",
+    "equipo": "Equipo que tengo",
+    "pesos": "Pesos de mis mancuernas (kg)",
+    "objetivo": "Objetivo",
+    "nivel": "Nivel",
+    "dias": "Días por semana",
+    "boton": "Subir mis datos",
+    "despues": "Ahora no",
+    "subiendo": "Subiendo tus datos…",
+    "listo": "¡Listo! Subimos {sesiones} entrenos a tu cuenta.",
+    "quedo_local": "Tus datos quedaron en tu cuenta en este teléfono y se subirán cuando haya conexión."
+  },
+  "consentimiento": {
+    "titulo": "Antes de guardar tus datos",
+    "texto": "Mi Entreno guarda en tu cuenta tu dolor, tus molestias y tus entrenos para mostrarte tu progreso. Solo tú puedes verlos, nunca se comparten ni se venden, y puedes exportarlos o borrarlos cuando quieras.",
+    "acepto": "Acepto que Mi Entreno guarde mis datos de salud en mi cuenta.",
+    "seguir": "Aceptar y seguir",
+    "falta": "Marca la casilla para seguir."
+  },
+  "zonas": {
+    "hombro": "Hombro",
+    "codo": "Codo",
+    "muneca": "Muñeca",
+    "cuello": "Cuello",
+    "espalda_alta": "Espalda alta",
+    "espalda_baja": "Espalda baja",
+    "cadera": "Cadera",
+    "rodilla": "Rodilla",
+    "tobillo": "Tobillo",
+    "otra": "Otra"
+  },
+  "lados": {
+    "izq": "Izquierdo",
+    "der": "Derecho",
+    "ambos": "Ambos"
+  },
+  "estados_molestia": {
+    "activa": "Activa",
+    "recuperacion": "En recuperación",
+    "antigua": "Antigua"
+  },
+  "movimientos": {
+    "sobre_cabeza": "Sobre la cabeza",
+    "colgarse": "Colgarse",
+    "empujar": "Empujar",
+    "tirar": "Tirar",
+    "impacto": "Impacto o saltos",
+    "flexion_rodilla": "Flexión profunda de rodilla",
+    "girar": "Girar el tronco",
+    "cargar_peso": "Cargar peso"
+  },
+  "equipos": {
+    "ninguno": "Sin equipo",
+    "barra_dominadas": "Barra de dominadas",
+    "mancuernas": "Mancuernas",
+    "kettlebell": "Kettlebell",
+    "bandas": "Bandas elásticas",
+    "banco": "Banco",
+    "barra_discos": "Barra y discos",
+    "maquinas": "Máquinas de gimnasio",
+    "otro": "Otro"
+  },
+  "objetivos": {
+    "recuperarme": "Recuperarme",
+    "fuerza": "Fuerza",
+    "salud": "Salud general",
+    "bajar_peso": "Bajar de peso"
+  },
+  "niveles": {
+    "pausa": "Vuelvo después de una pausa",
+    "principiante": "Principiante",
+    "intermedio": "Intermedio"
   }
 }

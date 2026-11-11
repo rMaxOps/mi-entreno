@@ -1,0 +1,8 @@
+{
+  "name": "mi-entreno-tests",
+  "private": true,
+  "type": "module",
+  "description": "Pruebas de seguridad (RLS) contra el proyecto mi-entreno-pruebas. Credenciales en tests/.env (no va al repo).",
+  "scripts": { "test": "node rls.test.mjs" },
+  "devDependencies": { "@supabase/supabase-js": "2.47.10" }
+}

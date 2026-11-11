@@ -27,6 +27,9 @@ La usan 5 personas de una familia, y cada una solo debe ver lo suyo.
 ## Esquema y migraciones
 - Todo cambio de base va en un archivo nuevo de `supabase/migrations/AAAAMMDDHHMMSS_descripcion.sql`.
   Nunca edites una migración ya aplicada: crea otra.
+- Se aplican con la CLI (`npx supabase@3.1.0 db push --remote`), que entra con el login del navegador
+  (sin la contraseña de la base). Primero en `mi-entreno-pruebas`; en producción **solo con permiso explícito**.
+- Los índices únicos van con `where deleted_at is null`: un registro borrado no debe bloquear uno nuevo.
 - Cada tabla de datos personales tiene:
   - `id uuid primary key` (generado en el teléfono con `crypto.randomUUID()`, para funcionar sin internet)
   - `user_id uuid not null references auth.users on delete cascade`
@@ -52,10 +55,18 @@ La usan 5 personas de una familia, y cada una solo debe ver lo suyo.
   `(storage.foldername(name))[1] = (select auth.uid())::text`.
 - **Tests de políticas** (en `mi-entreno-pruebas`) con dos usuarios A y B. Para cada tabla:
   A lee, crea, edita y borra lo suyo; A **no** ve ni toca nada de B; sin sesión no se ve nada;
-  nadie edita ejercicios globales. Corre los tests antes de cada PR que toque la base.
+  nadie edita ejercicios globales. Corre los tests antes de cada PR que toque la base:
+  `cd tests && npm install && npm test` (credenciales en `tests/.env`, que no va al repo).
+- Además prueba la app con dos usuarios en el navegador (importar, sincronizar, sin internet, otro
+  teléfono, conflicto y cerrar sesión) contra `mi-entreno-pruebas` (la app usa ese proyecto en localhost).
 
 ## Offline primero y sincronización
-- El teléfono guarda todo localmente (IndexedDB) y la app nunca espera a la red para mostrar algo.
+- El teléfono guarda todo localmente y la app nunca espera a la red para mostrar algo. Por ahora en
+  `localStorage`: el modo invitado en `mientreno.v1` y cada cuenta en `mientreno.cuenta.<id>`
+  (`js/estado.js`). Si una copia pasa de ~2 MB, migrar a IndexedDB.
+- La sincronización vive en `js/nube/sync.js`: al guardar detecta qué registro cambió (huella), le pone
+  `updated_at` y lo deja pendiente; sube los pendientes y baja lo nuevo desde el último `synced_at`.
+  Una sesión viaja con sus series y lecturas de dolor. **Sin consentimiento no se sube nada.**
 - Cada cambio se marca con `updated_at` (hora del teléfono) y queda en una cola de pendientes.
 - Al volver la conexión: se suben los pendientes y se bajan los cambios desde la última sincronización.
 - **Conflictos: gana la última edición, por registro** (el `updated_at` más nuevo). El servidor solo

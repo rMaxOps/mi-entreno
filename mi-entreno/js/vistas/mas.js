@@ -1,4 +1,5 @@
 /* Pantalla Más (ajustes). */
+import { cuentaCard } from '../nube/cuenta.js';
 import { GROUPS, PHASES, TYPES } from '../datos/catalogo.js';
 import { APP_VERSION, S } from '../estado.js';
 import { allEx } from '../logica/ejercicios.js';
@@ -12,7 +13,7 @@ export function vMas() {
   const st = S.settings;
   const num = (key, label, val, help) => `<div class="list-row"><span class="grow"><b>${label}</b>${help ? `<div class="tiny muted">${help}</div>` : ''}</span>
     <div class="stp-c" style="width:170px"><button class="stp-b" data-act="set-num" data-k="${key}" data-d="-1" aria-label="Menos">−</button><div class="stp-v" style="font-size:18px">${val}</div><button class="stp-b" data-act="set-num" data-k="${key}" data-d="1" aria-label="Más">+</button></div></div>`;
-  let h = installCard();
+  let h = cuentaCard() + installCard();
   h += `<div class="card"><h2>Apariencia</h2><div class="seg">${[['auto', 'Automático'], ['dark', 'Oscuro'], ['light', 'Claro']].map(([k, l]) => `<button class="${(st.theme || 'auto') === k ? 'on' : ''}" data-act="set-theme" data-v="${k}">${l}</button>`).join('')}</div>
     <p class="tiny muted">Automático sigue el modo claro u oscuro de tu teléfono.</p></div>`;
   h += `<div class="card"><h2>Hombro lesionado</h2><div class="seg">${[['izq', 'Izquierdo'], ['der', 'Derecho'], ['ambos', 'Ambos']].map(([k, l]) => `<button class="${st.side === k ? 'on' : ''}" data-act="set-side" data-v="${k}">${l}</button>`).join('')}</div></div>`;
