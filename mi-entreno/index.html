@@ -312,6 +312,20 @@ ol.howto li::before{content:counter(st);position:absolute;left:0;top:-1px;width:
 .light .lamp{width:46px;height:46px;border-radius:50%;flex:none;box-shadow:0 0 22px currentColor}
 
 /* ---------- Movimiento ---------- */
+/* ---------- Rutina desde foto o PDF ---------- */
+.loading{display:flex;align-items:center;gap:12px;color:var(--mu);margin:14px 0}
+.spin{width:28px;height:28px;border-radius:50%;border:3px solid var(--s3);border-top-color:var(--ac);animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rut-prev{display:block;max-width:100%;max-height:220px;margin:8px auto 4px;border-radius:12px;border:1px solid var(--line2);object-fit:contain;background:#fff}
+.rut-file{display:flex;gap:10px;align-items:center;background:var(--s2);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;margin:8px 0;font-weight:600}
+.ri{background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:12px;margin:0 0 10px}
+.ri .field{margin:10px 0 0}
+.ri-n{width:28px;height:28px;flex:none;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font:700 16px var(--f-num)}
+.ri-g2,.ri-g3{display:grid;gap:8px;margin-top:10px}
+.ri-g2{grid-template-columns:1fr 1fr}
+.ri-g3{grid-template-columns:1.2fr 1fr 1fr;align-items:end}
+.ri .stp-c .stp-b{width:40px}
+.ri .inp{background:var(--s1)}
 #view.enter > *{animation:enter .22s var(--ease) both}
 #view.enter > *:nth-child(2){animation-delay:.03s}
 #view.enter > *:nth-child(3){animation-delay:.06s}
@@ -1161,6 +1175,7 @@ function vPick() {
     <div class="row mt"><button class="link" data-act="ci-back">← Cambiar check-in</button></div></div>`;
   h += `<div class="note ${lv === 'r' ? 'bad' : 'info'}"><b>Recomendada hoy:</b> ${esc(getTpl(rec.id).name)}<div class="small">${esc(rec.why)}</div></div>`;
   h += `<button class="tog ${c.withRehab ? 'on' : ''}" data-act="ci-rehab"><span><b>Incluir Rehab al inicio</b><div class="muted small">Agrega los 5 ejercicios de Rehab antes de la rutina.</div></span><span class="sw"></span></button>`;
+  if (typeof importButton === 'function') h += importButton();
   list.forEach(t => {
     const items = sessionItemsFor(t, false);
     const cc = careCount(items), isRec = t.id === rec.id, no = lv === 'r' && t.id !== 'rehab';
@@ -1443,8 +1458,10 @@ function vMas() {
   h += `<div class="card"><h2>📖 Guía de ejercicios</h2><p class="muted small">Toca un ejercicio para ver cómo se hace, los errores comunes y un video.</p>
     ${GROUPS.map(g => { const es = allEx().filter(e => e.group === g); return es.length ? `<h3>${esc(g)}</h3>${es.map(e => `<button class="lib-item" data-act="guide-open" data-id="${esc(e.id)}"><span class="grow"><b>${esc(e.name)}</b></span>${shoulderBadge(e)}<span class="muted">›</span></button>`).join('')}` : ''; }).join('')}</div>`;
   h += `<div class="card"><div class="row between"><h2 class="mb0">Mis plantillas</h2><button class="btn sm" data-act="tpl-new">+ Nueva</button></div>
+    <div class="mt">${typeof importButton === 'function' ? importButton() : ''}</div>
     ${S.templates.length ? `<div class="mt">${S.templates.map(t => `<div class="list-row"><span class="grow"><b>${esc(t.name)}</b><div class="tiny muted">${plural(t.items.length, 'ejercicio', 'ejercicios')}</div></span><button class="btn sm" data-act="tpl-edit" data-id="${t.id}">Editar</button><button class="btn sm danger icon" data-act="tpl-del" data-id="${t.id}" aria-label="Borrar plantilla">✕</button></div>`).join('')}</div>` : '<p class="muted small">Aún no tienes plantillas propias. Puedes crearlas aquí o guardar una sesión como plantilla.</p>'}</div>`;
   const mine = S.exercises.filter(e => !e.hidden);
+  if (typeof aiSettingsCard === 'function') h += aiSettingsCard();
   h += `<div class="card"><div class="row between"><h2 class="mb0">Mis ejercicios</h2><button class="btn sm" data-act="ex-new">+ Nuevo</button></div>
     ${mine.length ? `<div class="mt">${mine.map(e => `<div class="list-row"><span class="grow"><b>${esc(e.name)}</b> ${shoulderBadge(e)}<div class="tiny muted">${esc(e.group)} · ${esc(TYPES[e.type])} · meta ${esc(e.goal)}</div></span><button class="btn sm" data-act="ex-edit" data-id="${e.id}">Editar</button></div>`).join('')}</div>` : '<p class="muted small">Crea ejercicios propios con nombre, grupo, tipo, etiqueta de hombro, meta y tip.</p>'}</div>`;
   h += `<div class="card"><h2>Respaldo</h2><p class="muted small">Tus datos viven solo en este teléfono. Descarga un respaldo de vez en cuando.</p>
@@ -1753,7 +1770,8 @@ const ACT = {
   'imp-paste': () => { const t = $('#imp-text').value.trim(); if (!t) return toast('Pega primero el JSON.', 'bad'); importData(t); },
   'guide-open': d => guideModal(d.id, d.from),
   'modal-close': () => closeModal(),
-  'modal-bg': (d, el, e) => { if (e.target === el) closeModal(); },
+  /* tocar fuera de la hoja la cierra, salvo cuando hay una rutina importada sin guardar */
+  'modal-bg': (d, el, e) => { if (e.target === el && !(UI.imp && ['review', 'confirm'].includes(UI.imp.step))) closeModal(); },
   'confirm-ok': () => { const fn = UI.confirmFn; closeModal(); if (fn) fn(); },
 };
 function syncTplInputs() {
@@ -1783,8 +1801,8 @@ const INP = {
   'exf-name': v => { UI.exEdit.name = v; }, 'exf-group': v => { UI.exEdit.group = v; }, 'exf-type': v => { UI.exEdit.type = v; },
   'exf-shoulder': v => { UI.exEdit.shoulder = v; }, 'exf-goal': v => { UI.exEdit.goal = v; }, 'exf-tip': v => { UI.exEdit.tip = v; },
 };
-document.addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.in; if (k && INP[k] && e.target.tagName !== 'SELECT') INP[k](e.target.value); });
-document.addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.in; if (k && INP[k] && (e.target.tagName === 'SELECT' || e.target.type === 'date')) INP[k](e.target.value); });
+document.addEventListener('input', e => { const k = e.target.dataset && e.target.dataset.in; if (k && INP[k] && e.target.tagName !== 'SELECT') INP[k](e.target.value, e.target); });
+document.addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.in; if (k && INP[k] && (e.target.tagName === 'SELECT' || e.target.type === 'date')) INP[k](e.target.value, e.target); });
 ACT['prog-metric'] = d => { UI.prog.metric = d.m; render(); };
 $('#imp-file').addEventListener('change', e => {
   const f = e.target.files && e.target.files[0]; if (!f) return;
@@ -1809,5 +1827,6 @@ $('#imp-file').addEventListener('change', e => {
   }
 })();
 </script>
+<script src="js/rutina.js"></script>
 </body>
 </html>
