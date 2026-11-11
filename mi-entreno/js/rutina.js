@@ -3,6 +3,7 @@
    Líneas como "3x10 remo 6 kg", "Plancha 3x30''" o "Sentadilla goblet 3x8-12 90s".
    La lectura de fotos y PDF con IA está en pausa: volverá en la etapa 6 desde un servidor.
    ========================================================= */
+import { tieneHombro } from './logica/perfil.js';
 import { GROUPS, TYPES } from './datos/catalogo.js';
 import { S, UI, save } from './estado.js';
 import { allEx, getEx } from './logica/ejercicios.js';
@@ -126,7 +127,7 @@ export function reviewView() {
   const opts = sel => `<option value="">— Ejercicio nuevo —</option>` + GROUPS.map(g => `<optgroup label="${esc(g)}">${lib.filter(e => e.group === g).map(e => `<option value="${esc(e.id)}" ${e.id === sel ? 'selected' : ''}>${esc(e.name)}</option>`).join('')}</optgroup>`).join('');
   let h = `<h2>Revisa tu rutina</h2>`;
   if (r.dudas.length) h += `<div class="note warn small"><b>Cosas que no se leyeron bien:</b><ul class="dots">${r.dudas.map(d => `<li>${esc(d)}</li>`).join('')}</ul>Corrígelas abajo antes de guardar.</div>`;
-  if (care.length) h += `<div class="note warn small"><b>⚠ Ojo con el hombro:</b> ${care.map(i => esc(i.name)).join(', ')} ${care.length === 1 ? 'carga' : 'cargan'} el hombro o van por encima de la cabeza. Hazlos solo si no duelen y con poco peso. Si tu kinesiólogo indicó otra cosa, manda eso.</div>`;
+  if (care.length && tieneHombro()) h += `<div class="note warn small"><b>⚠ Ojo con el hombro:</b> ${care.map(i => esc(i.name)).join(', ')} ${care.length === 1 ? 'carga' : 'cargan'} el hombro o van por encima de la cabeza. Hazlos solo si no duelen y con poco peso. Si tu kinesiólogo indicó otra cosa, manda eso.</div>`;
   h += `<div class="field"><label for="ri-name">Nombre de la plantilla</label><input class="inp" id="ri-name" data-in="ri-name" value="${esc(r.name)}"></div>`;
   if (r.notes) h += `<p class="small muted"><b>Notas de la rutina:</b> ${esc(r.notes)}</p>`;
   if (!r.items.length) h += '<p class="muted small">No quedan ejercicios.</p>';

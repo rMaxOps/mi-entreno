@@ -1,10 +1,12 @@
 /* Acciones de los botones (data-act) y entradas (data-in). */
+import { bulletsFase } from '../logica/fases.js';
+import { zonaDolor } from '../logica/perfil.js';
 import { GROUPS, PHASES } from '../datos/catalogo.js';
 import { S, UI, save } from '../estado.js';
 import { getEx, nextW, preOf, prevW } from '../logica/ejercicios.js';
 import { copyText, exportData, importData } from '../logica/respaldo.js';
 import { ACT, INP } from '../registro.js';
-import { $, DAY, clamp, dayStr, pLevel, uid } from '../util.js';
+import { $, DAY, cap, clamp, dayStr, esc, pLevel, uid } from '../util.js';
 import { findItem, logSet, newItem, startSession } from '../vistas/entreno.js';
 import { finishSave } from '../vistas/terminar.js';
 import { guideModal, updPainSlider } from './componentes.js';
@@ -67,14 +69,14 @@ Object.assign(ACT, {
   'nd-save': () => {
     const s = S.sessions.find(x => x.id === UI.nd.id); if (!s) return closeModal();
     s.nextDay = { pain: UI.nd.pain, at: Date.now() }; save(); render();
-    if (s.nextDay.pain >= preOf(s) + 2) openModal(`<h2>Amaneció peor</h2><div class="note warn">El hombro está ${s.nextDay.pain - preOf(s)} puntos peor que antes de entrenar (${preOf(s)} → ${s.nextDay.pain}). <b>La próxima vez baja la carga</b>: la app ya lo considera en las sugerencias.</div><p class="small muted">Si es dolor punzante, con hormigueo o pérdida de fuerza, consulta a tu kinesiólogo.</p><button class="btn pri big mt" data-act="modal-close">Entendido</button>`);
+    if (s.nextDay.pain >= preOf(s) + 2) openModal(`<h2>Amaneció peor</h2><div class="note warn">${esc(cap(zonaDolor() || 'el dolor'))} está ${s.nextDay.pain - preOf(s)} puntos peor que antes de entrenar (${preOf(s)} → ${s.nextDay.pain}). <b>La próxima vez baja la carga</b>: la app ya lo considera en las sugerencias.</div><p class="small muted">Si es dolor punzante, con hormigueo o pérdida de fuerza, consulta a tu kinesiólogo.</p><button class="btn pri big mt" data-act="modal-close">Entendido</button>`);
     else { closeModal(); toast('Guardado. ¡Gracias!', 'ok'); }
   },
   'nd-skip': () => { S.ui.ndSkip[UI.nd.id] = true; save(); closeModal(); render(); },
   'phase-set': d => {
     const p = +d.p; if (p === S.settings.phase) return;
     const go = () => { S.settings.phase = p; S.settings.phaseSince = dayStr(Date.now()); S.ui.phaseSnooze = 0; if (p === 3 && S.settings.perWeek < 4) S.settings.perWeek = 4; save(); render(); toast(`Ahora estás en la Fase ${p} · ${PHASES[p].name}.`, 'ok'); };
-    ask(`¿Cambiar a la Fase ${p}?`, `${PHASES[p].name}: ${PHASES[p].bullets[0]}`, 'Cambiar', go, false);
+    ask(`¿Cambiar a la Fase ${p}?`, `${PHASES[p].name}: ${bulletsFase(p)[0]}`, 'Cambiar', go, false);
   },
   'phase-snooze': () => { S.ui.phaseSnooze = Date.now() + 3 * DAY; save(); render(); },
   'hist-toggle': d => { UI.histOpen[d.id] = !UI.histOpen[d.id]; render(); },

@@ -40,7 +40,7 @@ export function finishSave() {
       <div class="stat"><b>${kg(Math.round(volumeOf(sess)))}</b><span>kg de volumen</span></div>
       <div class="stat"><b><span class="p-${pLevel(preOf(sess))}">${preOf(sess)}</span><span class="muted" style="font-size:24px"> → </span><span class="p-${pLevel(sess.painEnd)}">${sess.painEnd}</span></b><span>dolor antes → después</span></div>
     </div>
-    ${up > 0 ? `<div class="note warn small">Tu dolor subió ${up} ${up === 1 ? 'punto' : 'puntos'}. Mañana revisa cómo amanece el hombro: la app te lo preguntará al abrirla.</div>` : '<div class="note up small">El dolor no subió. ¡Bien hecho!</div>'}
+    ${up > 0 ? `<div class="note warn small">Tu dolor subió ${up} ${up === 1 ? 'punto' : 'puntos'}. Mañana revisa cómo amaneces${zonaDolor() ? ` (tu ${esc(zonaDolor())})` : ''}: la app te lo preguntará al abrirla.</div>` : '<div class="note up small">El dolor no subió. ¡Bien hecho!</div>'}
     <button class="btn pri big mt" data-act="modal-close">Listo</button>`);
 }
 

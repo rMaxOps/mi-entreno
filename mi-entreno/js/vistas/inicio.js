@@ -1,4 +1,5 @@
 /* Pantalla Inicio. */
+import { bulletsFase } from '../logica/fases.js';
 import { t } from '../i18n.js';
 import { onboardingPendiente, tieneDatos, zonaDolor } from '../logica/perfil.js';
 import { PHASES, RULES } from '../datos/catalogo.js';
@@ -24,7 +25,7 @@ export function vInicio() {
   const calPhase = wk <= 2 ? 1 : wk <= 5 ? 2 : 3;
   h += `<div class="card"><div class="row between"><h2 class="mb0">Fase ${st.phase} · ${P.name}</h2><span class="badge ac">Semana ${wk}</span></div>
     <p class="muted small">${P.weeks} del plan · desde el ${fmtDate(parseDay(st.phaseSince || st.startDate), { day: 'numeric', month: 'long' })}</p>
-    <ul class="dots small">${P.bullets.map(b => `<li>${esc(b)}</li>`).join('')}</ul>
+    <ul class="dots small">${bulletsFase(st.phase).map(b => `<li>${esc(b)}</li>`).join('')}</ul>
     ${calPhase > st.phase ? `<p class="tiny muted">Por calendario tocaría la Fase ${calPhase}, pero avanzas solo cuando se cumplen las reglas.</p>` : ''}
     <div class="note ${rec.rest ? 'warn' : 'info'}"><b>Hoy toca:</b> ${esc(getTpl(rec.id).name)}${rec.withRehab && rec.id !== 'rehab' ? ' + Rehab' : ''}<div class="small muted">${esc(rec.why)}</div></div>
     ${S.draft ? '' : `<button class="btn pri big" data-act="go-checkin">Empezar entreno</button>`}
@@ -50,7 +51,7 @@ export function vInicio() {
   return h;
 }
 export function rulesCard() {
-  return `<div class="card"><h2>Reglas del hombro</h2><ul class="clean rules small">${RULES.map(([c, t]) =>
+  return `<div class="card"><h2>Reglas del dolor</h2><ul class="clean rules small">${RULES.map(([c, t]) =>
     `<li class="row" style="align-items:flex-start"><span class="pill ${c ? 'bg-' + c : 'na'}">${c === 'g' ? '✓' : c ? '!' : 'i'}</span><span>${esc(t)}</span></li>`).join('')}</ul>
     <p class="muted small"><i>Son pautas generales; si tu kinesiólogo te dio indicaciones, mandan esas.</i></p></div>`;
 }

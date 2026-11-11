@@ -1,6 +1,6 @@
 /* Hojas y diálogos dentro de la app (sin alert/confirm). */
 import { t } from '../i18n.js';
-import { zonaDolor } from '../logica/perfil.js';
+import { tieneHombro, zonaDolor } from '../logica/perfil.js';
 import { GROUPS, TYPES } from '../datos/catalogo.js';
 import { S, UI, save } from '../estado.js';
 import { allEx, getEx, preOf } from '../logica/ejercicios.js';
@@ -23,8 +23,8 @@ export function ask(title, text, okLabel, fn, danger = true) {
 }
 export function libModal() {
   const q = UI.lib.q.trim().toLowerCase();
-  const exs = allEx().filter(e => !q || e.name.toLowerCase().includes(q) || e.group.toLowerCase().includes(q));
-  const groups = [...new Set([...GROUPS, ...exs.map(e => e.group)])];
+  const exs = allEx().filter(e => (e.group !== 'Rehab hombro' || tieneHombro()) && (!q || e.name.toLowerCase().includes(q) || e.group.toLowerCase().includes(q)));
+  const groups = [...new Set([...GROUPS, ...exs.map(e => e.group)])].filter(g => g !== 'Rehab hombro' || tieneHombro());
   let list = '';
   groups.forEach(g => {
     const es = exs.filter(e => e.group === g); if (!es.length) return;
@@ -66,7 +66,7 @@ export function exEditor() {
     <div class="field"><label for="exf-name">Nombre</label><input class="inp" id="exf-name" data-in="exf-name" value="${esc(e.name)}" placeholder="Ej: Face pull con banda"></div>
     <div class="field"><label for="exf-group">Grupo</label>${sel('exf-group', GROUPS.map(g => [g, g]), e.group)}</div>
     <div class="field"><label for="exf-type">Tipo</label>${sel('exf-type', Object.entries(TYPES), e.type)}</div>
-    <div class="field"><label for="exf-shoulder">Hombro</label>${sel('exf-shoulder', [['ok', 'Amigable'], ['care', '⚠ Cuidado']], e.shoulder)}</div>
+    <div class="field" ${tieneHombro() ? '' : 'hidden'}><label for="exf-shoulder">Hombro</label>${sel('exf-shoulder', [['ok', 'Amigable'], ['care', '⚠ Cuidado']], e.shoulder)}</div>
     <div class="field"><label for="exf-goal">Meta (ej: 8-12)</label><input class="inp" id="exf-goal" data-in="exf-goal" value="${esc(e.goal)}"></div>
     <div class="field"><label for="exf-tip">Tip de técnica</label><textarea class="inp" id="exf-tip" data-in="exf-tip">${esc(e.tip)}</textarea></div>
     <div class="row mt2">${e.id ? '<button class="btn danger" data-act="ex-del">Borrar</button>' : ''}<button class="btn grow" data-act="${e.back === 'lib' ? 'lib-back' : 'modal-close'}">Cancelar</button><button class="btn pri grow" data-act="ex-save">Guardar</button></div>`);

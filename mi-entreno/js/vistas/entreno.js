@@ -1,6 +1,6 @@
 /* Pantalla Entreno: check-in, elegir rutina y sesión. */
 import { t } from '../i18n.js';
-import { zonaDolor } from '../logica/perfil.js';
+import { calentamiento, calentamientoDe, tieneHombro, zonaDolor } from '../logica/perfil.js';
 import { ENERGY, ENERGY_TXT, WARMUP } from '../datos/catalogo.js';
 import { INTRO_RUTINA, decir } from '../dialogos.js';
 import { S, UI, save } from '../estado.js';
@@ -40,14 +40,14 @@ export function vPick() {
   const c = UI.ci, p = c.pain, lv = pLevel(p), rec = recommend(p), ph = S.settings.phase;
   const L = { g: ['Verde', 'Dolor bajo: entrena normal y sigue la progresión.'],
     y: ['Amarillo', 'Dolor moderado: baja la carga (la app te propondrá un peso menos), acorta el rango y prefiere variantes suaves. Ojo con los ejercicios ⚠.'],
-    r: ['Rojo', 'Dolor alto: hoy solo Rehab de hombro suave, o descanso. Si el dolor es punzante, hay hormigueo o pérdida de fuerza, consulta a tu kinesiólogo.'] }[lv];
+    r: ['Rojo', (tieneHombro() ? 'Dolor alto: hoy solo Rehab de hombro suave, o descanso.' : 'Dolor alto: hoy mejor descanso o algo muy suave.') + ' Si el dolor es punzante, hay hormigueo o pérdida de fuerza, consulta a tu kinesiólogo.'] }[lv];
   if (c.withRehab == null) c.withRehab = !!rec.withRehab;
-  const list = allTpl().slice().sort((a, b) => (b.id === rec.id) - (a.id === rec.id));
+  const list = allTpl().filter(t => t.id !== 'rehab' || tieneHombro()).slice().sort((a, b) => (b.id === rec.id) - (a.id === rec.id));
   let h = `<div class="card ${lv}"><div class="light"><div class="lamp bg-${lv}" style="color:${pColor(p)}"></div><div><b>Semáforo ${L[0]} · dolor ${p}/10</b><div class="small">${L[1]}</div></div></div>
     ${checkinCoach(c, lv)}
     <div class="row mt"><button class="link" data-act="ci-back">← Cambiar check-in</button></div></div>`;
   h += `<div class="note ${lv === 'r' ? 'bad' : 'info'}"><b>Recomendada hoy:</b> ${esc(getTpl(rec.id).name)}<div class="small">${esc(rec.why)}</div></div>`;
-  h += `<button class="tog ${c.withRehab ? 'on' : ''}" data-act="ci-rehab"><span><b>Incluir Rehab al inicio</b><div class="muted small">Agrega los 5 ejercicios de Rehab antes de la rutina.</div></span><span class="sw"></span></button>`;
+  if (tieneHombro()) h += `<button class="tog ${c.withRehab ? 'on' : ''}" data-act="ci-rehab"><span><b>Incluir Rehab al inicio</b><div class="muted small">Agrega los 5 ejercicios de Rehab antes de la rutina.</div></span><span class="sw"></span></button>`;
   if (typeof importButton === 'function') h += importButton();
   list.forEach(t => {
     const items = sessionItemsFor(t, false);
@@ -56,26 +56,26 @@ export function vPick() {
       <div class="row between"><b>${esc(t.name)}</b>${isRec ? '<span class="badge ac">Recomendada</span>' : no ? '<span class="badge bad">No recomendado hoy</span>' : ''}</div>
       <div class="muted small">${esc(t.desc || '')}</div>
       <div class="row wrap mt" style="gap:6px"><span class="badge">${plural(items.length, 'ejercicio', 'ejercicios')}</span>
-        ${cc ? `<span class="badge ${lv === 'g' ? 'care' : 'warn'}" ${lv === 'y' ? 'style="font-size:13.5px"' : ''}>⚠ ${plural(cc, 'ejercicio con cuidado', 'ejercicios con cuidado')}</span>` : '<span class="badge ok">Amigable con el hombro</span>'}
+        ${!tieneHombro() ? '' : cc ? `<span class="badge ${lv === 'g' ? 'care' : 'warn'}" ${lv === 'y' ? 'style="font-size:13.5px"' : ''}>⚠ ${plural(cc, 'ejercicio con cuidado', 'ejercicios con cuidado')}</span>` : '<span class="badge ok">Amigable con el hombro</span>'}
         ${ph === 1 && t.id === 'full' ? '<span class="badge">2 series · Fase 1</span>' : ''}</div>
-      ${t.extra ? `<div class="tiny muted mt">${esc(t.extra)}${t.id === 'b' && neutralPressOk() ? ' <b class="p-g">Tu dolor estuvo en 0-1 estas 2 semanas: ya se agregó a la rutina.</b>' : ''}</div>` : ''}
+      ${t.extra && tieneHombro() ? `<div class="tiny muted mt">${esc(t.extra)}${t.id === 'b' && neutralPressOk() ? ' <b class="p-g">Tu dolor estuvo en 0-1 estas 2 semanas: ya se agregó a la rutina.</b>' : ''}</div>` : ''}
     </button>`;
   });
   return h;
 }
 /* Arma la lista de ejercicios de una sesión según la plantilla y la fase */
 export function sessionItemsFor(t, withRehab) {
-  const ph = S.settings.phase;
+  const ph = S.settings.phase, hombro = tieneHombro();
   let items = [];
-  if (withRehab && t.id !== 'rehab') items = getTpl('rehab').items.map(i => ({ ...i }));
+  if (withRehab && hombro && t.id !== 'rehab') items = getTpl('rehab').items.map(i => ({ ...i }));
   t.items.forEach(i0 => {
     const i = { ...i0 };
-    if (ph === 1 && ['pullup', 'chinup', 'negative', 'knee_raise'].includes(i.ex)) {
+    if (hombro && ph === 1 && ['pullup', 'chinup', 'negative', 'knee_raise'].includes(i.ex)) {
       if (items.some(x => x.ex === 'dead_hang') || t.items.some(x => x.ex === 'dead_hang')) return;
       Object.assign(i, { ex: 'dead_hang', sets: 2, goal: '15-30', rest: 60, note: 'Fase 1: colgado con pies apoyados en vez de dominadas.' });
     }
     /* Fase 2: las negativas entran solo si el colgado no duele; las dominadas completas, desde la Fase 3 */
-    if (ph === 2 && ['pullup', 'chinup', 'negative'].includes(i.ex)) {
+    if (hombro && ph === 2 && ['pullup', 'chinup', 'negative'].includes(i.ex)) {
       if (hangOk()) {
         if (i.ex !== 'negative') Object.assign(i, { ex: 'negative', goal: '3-6', rest: 120, note: 'Fase 2: negativas. Las dominadas completas se prueban en la Fase 3.' });
       } else {
@@ -84,12 +84,12 @@ export function sessionItemsFor(t, withRehab) {
       }
     }
     /* Elevación de rodillas colgado: solo si el colgado no duele; si no, dead bug */
-    if (ph === 2 && i.ex === 'knee_raise' && !hangOk()) Object.assign(i, { ex: 'dead_bug', goal: '8-12', rest: 45, note: 'En vez de colgarte: dead bug, hasta que el colgado no duela.' });
+    if (hombro && ph === 2 && i.ex === 'knee_raise' && !hangOk()) Object.assign(i, { ex: 'dead_bug', goal: '8-12', rest: 45, note: 'En vez de colgarte: dead bug, hasta que el colgado no duela.' });
     if (ph === 1 && t.id === 'full') i.sets = Math.min(i.sets, 2);
     items.push(i);
   });
   /* B · Empuje: el press de hombro neutro se agrega cuando el dolor lleva 2 semanas en 0-1 */
-  if (t.id === 'b' && neutralPressOk() && !items.some(x => x.ex === 'neutral_press'))
+  if (hombro && t.id === 'b' && neutralPressOk() && !items.some(x => x.ex === 'neutral_press'))
     items.push({ ex: 'neutral_press', sets: 2, goal: '8-12', rest: 90, note: 'Se agrega porque tu dolor estuvo en 0-1 por 2 semanas. Solo si subir el brazo no duele.' });
   return items;
 }
@@ -107,7 +107,7 @@ export function startSession(tplId) {
   if (yellow) banner.push('Semáforo amarillo: hoy un peso menos y rango más corto.');
   if (pLevel(c.pain) === 'r' && tplId !== 'rehab') banner.push('Dolor alto: esta rutina no está recomendada hoy. Ve con mucho cuidado y detente si sube.');
   S.draft = { id: uid(), start: Date.now(), tplId: t.id, tplName: t.name, phase: ph, withRehab: !!(c.withRehab && tplId !== 'rehab'),
-    checkin: { pain: c.pain, energy: c.energy, sleep: c.sleep }, warmup: WARMUP.map(() => false), warmOpen: true,
+    checkin: { pain: c.pain, energy: c.energy, sleep: c.sleep }, warmup: calentamiento().map(() => false), warmOpen: true,
     banner: banner.join(' '), notes: '', rest: null, items: [] };
   items.forEach(i => S.draft.items.push(newItem(i, yellow)));
   if (S.draft.items[0]) S.draft.items[0].open = true;
@@ -139,8 +139,8 @@ export function vSession() {
   if (d.banner) h += `<div class="note warn small">${esc(d.banner)}</div>`;
   if (d.intro && !doneSets && typeof pjStill === 'function') h += `<div class="card"><div class="pj-row" style="margin:0">${pjStill(d.intro.who)}${pjBubble(d.intro.who, esc(d.intro.text))}</div></div>`;
   h += `<div class="card"><button class="row between" style="width:100%;background:none;border:0;padding:0;cursor:pointer" data-act="wu-open">
-      <h2 class="mb0">Calentamiento</h2><span class="badge ${wd === WARMUP.length ? 'ok' : ''}">${wd}/${WARMUP.length} ${d.warmOpen ? '▴' : '▾'}</span></button>
-    ${d.warmOpen ? `<div class="mt">${WARMUP.map((w, i) => `<button class="chk ${d.warmup[i] ? 'on' : ''}" data-act="wu" data-i="${i}"><span class="box">${d.warmup[i] ? '✓' : ''}</span><span>${esc(w)}</span></button>`).join('')}</div>` : ''}</div>`;
+      <h2 class="mb0">Calentamiento</h2><span class="badge ${wd === d.warmup.length ? 'ok' : ''}">${wd}/${d.warmup.length} ${d.warmOpen ? '▴' : '▾'}</span></button>
+    ${d.warmOpen ? `<div class="mt">${calentamientoDe(d).map((w, i) => `<button class="chk ${d.warmup[i] ? 'on' : ''}" data-act="wu" data-i="${i}"><span class="box">${d.warmup[i] ? '✓' : ''}</span><span>${esc(w)}</span></button>`).join('')}</div>` : ''}</div>`;
   if (!d.items.length) h += `<div class="empty"><div class="e">🏋️</div><p>Sesión vacía. Agrega ejercicios desde la biblioteca.</p></div>`;
   d.items.forEach((it, idx) => { h += vItem(it, idx); });
   h += `<button class="btn block mt" data-act="lib-open" data-target="draft">+ Agregar ejercicio</button>

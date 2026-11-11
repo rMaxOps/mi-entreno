@@ -1,4 +1,6 @@
 /* Plan por fases, metas semanales y recomendación del día. */
+import { PHASES } from '../datos/catalogo.js';
+import { tieneHombro } from './perfil.js';
 import { S } from '../estado.js';
 import { DAY, addDays, avg, dayStr, n1, parseDay, weekStart } from '../util.js';
 import { getTpl, maxPainOf, preOf, sessions } from './ejercicios.js';
@@ -34,8 +36,19 @@ export function phaseCheck() {
     ],
   };
 }
+/* Puntos de cada fase. Los del hombro (Rehab, dominadas con cuidado, rotación externa) solo para quien lo necesita. */
+export function bulletsFase(p) {
+  const b = PHASES[p].bullets;
+  if (tieneHombro()) return b;
+  return { 1: ['3 días por semana: Cuerpo completo (2 series por ejercicio, en vez de 3).', b[1]], 2: [b[0]], 3: [b[0], b[1]] }[p] || b;
+}
 export function recommend(pain) {
   const ph = S.settings.phase, ss = sessions();
+  /* Sin molestia de hombro no hay Rehab de hombro: los días de descanso se recomiendan como tales */
+  if (!tieneHombro()) {
+    if (pain != null && pain >= 5) return { id: 'libre', rest: true, why: 'Dolor 5 o más: hoy mejor descansa o haz algo muy suave.' };
+    if (ss.some(s => dayStr(s.start) === dayStr(Date.now()))) return { id: 'libre', rest: true, why: 'Ya entrenaste hoy: mejor descansa.' };
+  }
   const today = dayStr(Date.now()), yest = dayStr(addDays(new Date(), -1));
   if (pain != null && pain >= 5) return { id: 'rehab', why: 'Dolor 5 o más: hoy solo Rehab de hombro suave, o descanso.' };
   if (ss.some(s => dayStr(s.start) === today && s.tplId !== 'rehab'))
@@ -45,7 +58,9 @@ export function recommend(pain) {
   const rehabWeek = ss.filter(s => s.start >= ws && (s.tplId === 'rehab' || s.withRehab)).length;
   if (ph < 3) {
     if (lastMain && dayStr(lastMain.start) === yest && lastMain.tplId === 'full')
-      return { id: 'rehab', rest: true, why: 'Ayer hiciste Cuerpo completo: hoy toca descanso o Rehab suave. Mañana, Cuerpo completo.' };
+      return tieneHombro() ? { id: 'rehab', rest: true, why: 'Ayer hiciste Cuerpo completo: hoy toca descanso o Rehab suave. Mañana, Cuerpo completo.' }
+        : { id: 'libre', rest: true, why: 'Ayer hiciste Cuerpo completo: hoy toca descanso. Mañana, Cuerpo completo.' };
+    if (!tieneHombro()) return { id: 'full', withRehab: false, why: ph === 1 ? 'Fase 1: Cuerpo completo con 2 series por ejercicio.' : 'Fase 2: Cuerpo completo con 3 series.' };
     return { id: 'full', withRehab: ph === 1 || rehabWeek < 2,
       why: ph === 1 ? 'Fase 1: Cuerpo completo con 2 series por ejercicio + Rehab al inicio.'
         : 'Fase 2: Cuerpo completo con 3 series.' + (rehabWeek < 2 ? ' Parte con Rehab (2-3 veces por semana).' : '') };
