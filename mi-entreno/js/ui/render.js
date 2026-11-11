@@ -1,7 +1,8 @@
 /* Dibuja la pantalla actual, el tema y el confeti. */
 import { t } from '../i18n.js';
 import { S, UI } from '../estado.js';
-import { pjObserve } from '../personajes.js';
+import { CAST, pjObserve } from '../personajes.js';
+import { tieneHombro } from '../logica/perfil.js';
 import { $, hms } from '../util.js';
 import { vEntreno } from '../vistas/entreno.js';
 import { vHistorial } from '../vistas/historial.js';
@@ -19,6 +20,7 @@ export function applyTheme() {
   if (bg) $('meta[name="theme-color"]').setAttribute('content', bg);
 }
 export function render() {
+  CAST.coach.name = tieneHombro() ? 'Coach Hombro' : 'Coach';
   document.querySelectorAll('#tabs button').forEach(b => {
     const on = b.dataset.tab === UI.tab; b.classList.toggle('on', on);
     if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');

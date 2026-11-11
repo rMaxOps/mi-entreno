@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Mi Entreno",
   "short_name": "Mi Entreno",
-  "description": "Registro personal de entrenos en casa con seguimiento del dolor de hombro.",
+  "description": "Registro de entrenos con seguimiento del dolor por zona.",
   "lang": "es-CL",
   "start_url": "./",
   "scope": "./",

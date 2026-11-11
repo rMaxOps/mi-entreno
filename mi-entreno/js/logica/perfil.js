@@ -2,6 +2,7 @@
    Vive en S.profile (sin cuenta y con cuenta) y se sincroniza con las tablas
    profiles, conditions y equipment (js/nube/sync.js). */
 import { S } from '../estado.js';
+import { WARMUP, WARMUP_GENERAL } from '../datos/catalogo.js';
 import { t } from '../i18n.js';
 
 export const ZONAS = ['hombro', 'codo', 'muneca', 'cuello', 'espalda_alta', 'espalda_baja', 'cadera', 'rodilla', 'tobillo', 'otra'];
@@ -46,6 +47,19 @@ export function zonaDolor(st = S) {
   if (tieneDatos(st) && !perfil(st).onboarded_at) return nombreMolestia({ zone: 'hombro', side: st.settings.side || 'der' });
   return null;
 }
+
+/* ¿Se muestra lo específico del hombro (rehab, calentamiento, avisos ⚠, "Coach Hombro")?
+   Solo si tiene una molestia de hombro activa o en recuperación, o si es un usuario de la versión 1
+   (con datos y sin perfil), que se hizo para el hombro. */
+export function tieneHombro(st = S) {
+  const p = perfil(st);
+  if (p.conditions.some(c => c.zone === 'hombro' && c.status !== 'antigua')) return true;
+  return !p.conditions.length && tieneDatos(st) && !p.onboarded_at;
+}
+/* Calentamiento: el del hombro (6 pasos) o uno general (4 pasos) */
+export const calentamiento = (st = S) => (tieneHombro(st) ? WARMUP : WARMUP_GENERAL);
+/* En el historial, cada sesión muestra la lista que usó (se reconoce por su largo) */
+export const calentamientoDe = s => ((s.warmup || []).length === WARMUP_GENERAL.length ? WARMUP_GENERAL : WARMUP);
 
 export function nuevaMolestia() {
   return { id: crypto.randomUUID(), zone: 'hombro', zone_other: '', side: 'der', status: 'activa', since: '', notes: '', bothers: [], threshold: 4 };

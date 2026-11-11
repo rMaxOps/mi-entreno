@@ -1,4 +1,5 @@
 /* Componentes: stepper, slider de dolor y guía de ejercicios. */
+import { tieneHombro } from '../logica/perfil.js';
 import { GUIDE, TYPES } from '../datos/catalogo.js';
 import { S } from '../estado.js';
 import { getEx } from '../logica/ejercicios.js';
@@ -29,7 +30,7 @@ export function updPainSlider(id, v) {
   if (f && f.textContent !== painFace(v)) { f.textContent = painFace(v); f.classList.remove('pop'); void f.offsetWidth; f.classList.add('pop'); }
   const r = $(`[data-in="${id}"]`); if (r) r.setAttribute('aria-valuetext', `${v} de 10, ${painWord(v)}`);
 }
-export const shoulderBadge = ex => ex.shoulder === 'care' ? '<span class="badge care">⚠ cuidado</span>' : '';
+export const shoulderBadge = ex => ex.shoulder === 'care' && tieneHombro() ? '<span class="badge care">⚠ cuidado</span>' : '';
 export function guideHtml(ex) {
   const g = GUIDE[ex.id];
   let h = '<div class="guide">';
@@ -40,7 +41,7 @@ export function guideHtml(ex) {
     h += `<h4>Cómo se hace</h4><p class="small">${esc(ex.tip || 'Sin descripción. Puedes agregar un tip editando el ejercicio en Más.')}</p>`;
   }
   const care = [g && g.shoulder, ex.shoulder === 'care' && g ? ex.tip : ''].filter(Boolean);
-  if (care.length) h += `<div class="note ${ex.shoulder === 'care' ? 'warn' : 'info'} small"><b>${ex.shoulder === 'care' ? '⚠ ' : ''}Tu hombro:</b> ${care.map(esc).join(' ')}</div>`;
+  if (care.length && tieneHombro()) h += `<div class="note ${ex.shoulder === 'care' ? 'warn' : 'info'} small"><b>${ex.shoulder === 'care' ? '⚠ ' : ''}Tu hombro:</b> ${care.map(esc).join(' ')}</div>`;
   if (g && g.video) {
     h += `<a class="btn block vid" href="${esc(g.video.url)}" target="_blank" rel="noopener">▶ Ver video</a>
       <p class="tiny muted center">“${esc(g.video.title)}” · ${esc(g.video.channel)}<br>Se abre en YouTube (necesita internet)</p>`;

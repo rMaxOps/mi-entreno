@@ -1,4 +1,5 @@
 /* Sugerencias de progresión (reglas de docs/especificacion.md). */
+import { zonaDolor } from './perfil.js';
 import { S } from '../estado.js';
 import { cap, clamp, kg, parseGoal } from '../util.js';
 import { getEx, lastFor, nextW, preOf, prevW, weightsFor } from './ejercicios.js';
@@ -15,7 +16,7 @@ export function suggest(ex, item) {
   const nd = last.s.nextDay;
   const worse = !!(nd && nd.pain >= preOf(last.s) + 2);
   const hurt = maxP >= th || worse;
-  const why = maxP >= th ? `la última vez el dolor llegó a ${maxP}/10` : 'el hombro amaneció peor al día siguiente';
+  const why = maxP >= th ? `la última vez el dolor llegó a ${maxP}/10` : (zonaDolor() ? `tu ${zonaDolor()} amaneció peor al día siguiente` : 'amaneciste peor al día siguiente');
   const target = item.sets || sets.length;
 
   if (ex.type === 't') {

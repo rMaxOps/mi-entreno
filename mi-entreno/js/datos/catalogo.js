@@ -1,4 +1,4 @@
-/* Datos base: ejercicios, guía, calentamiento, plantillas, fases y reglas del hombro. */
+/* Datos base: ejercicios, guía, calentamiento, plantillas, fases y reglas del dolor. */
 /* ---------- Datos base ---------- */
 export const GROUPS = ['Rehab hombro', 'Tirón', 'Empuje', 'Piernas', 'Core'];
 export const TYPES = { wr: 'Peso + reps', bw: 'Peso corporal (lastre opcional)', r: 'Solo reps', t: 'Tiempo (segundos)' };
@@ -234,6 +234,13 @@ export const WARMUP = [
   'Rotación externa liviana 1×15 por lado',
   'Retracciones escapulares 1×10',
   'Deslizamientos en pared 1×10',
+  'Primera serie de cada ejercicio con poco peso',
+];
+/* Para quien no tiene molestia de hombro */
+export const WARMUP_GENERAL = [
+  '5 min de movilidad general (caminar, saltos suaves)',
+  'Círculos de brazos, de pequeños a grandes',
+  'Movilidad de cadera, rodillas y tobillos',
   'Primera serie de cada ejercicio con poco peso',
 ];
 

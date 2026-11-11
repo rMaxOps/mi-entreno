@@ -1,4 +1,5 @@
 /* Pantalla Historial. */
+import { calentamientoDe } from '../logica/perfil.js';
 import { ENERGY, ENERGY_TXT, WARMUP } from '../datos/catalogo.js';
 import { UI } from '../estado.js';
 import { fmtSetLong, getEx, preOf, sessions, setsOf, volumeOf } from '../logica/ejercicios.js';
@@ -26,7 +27,7 @@ export function vHistDetail(s) {
     <dt>Energía</dt><dd>${ci.energy ? `${ENERGY[ci.energy - 1]} ${ENERGY_TXT[ci.energy - 1]}` : '—'}</dd>
     <dt>Sueño</dt><dd>${ci.sleep != null ? n1(ci.sleep) + ' h' : '—'}</dd>
     <dt>Volumen</dt><dd>${kg(Math.round(volumeOf(s)))} kg</dd>
-    <dt>Calentam.</dt><dd>${(s.warmup || []).filter(Boolean).length}/${WARMUP.length}${(s.warmup || []).some(Boolean) ? `<div class="tiny muted">${WARMUP.filter((w, i) => s.warmup[i]).map(esc).join(' · ')}</div>` : ''}</dd></dl>`;
+    <dt>Calentam.</dt><dd>${(s.warmup || []).filter(Boolean).length}/${calentamientoDe(s).length}${(s.warmup || []).some(Boolean) ? `<div class="tiny muted">${calentamientoDe(s).filter((w, i) => s.warmup[i]).map(esc).join(' · ')}</div>` : ''}</dd></dl>`;
   if (s.nextDay && s.nextDay.pain >= preOf(s) + 2) h += `<div class="note warn small">Al día siguiente amaneció ${s.nextDay.pain - preOf(s)} puntos peor: la próxima vez baja la carga.</div>`;
   s.items.forEach(i => {
     const ex = getEx(i.ex);

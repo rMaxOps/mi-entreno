@@ -1,4 +1,6 @@
 /* Pantalla Más (ajustes). */
+import { bulletsFase } from '../logica/fases.js';
+import { tieneHombro } from '../logica/perfil.js';
 import { cuentaCard } from '../nube/cuenta.js';
 import { GROUPS, PHASES, TYPES } from '../datos/catalogo.js';
 import { APP_VERSION, S } from '../estado.js';
@@ -26,10 +28,10 @@ export function vMas() {
   h += `<div class="card"><h2>Plan por fases</h2><div class="seg">${[1, 2, 3].map(p => `<button class="${st.phase === p ? 'on' : ''}" data-act="phase-set" data-p="${p}">Fase ${p}</button>`).join('')}</div>
     <div class="field"><label for="start-date">Fecha de inicio del plan</label><input class="inp" type="date" id="start-date" data-in="start-date" value="${esc(st.startDate)}"></div>
     <div class="field"><label for="phase-since">Fase actual desde</label><input class="inp" type="date" id="phase-since" data-in="phase-since" value="${esc(st.phaseSince || st.startDate)}"></div>
-    ${[1, 2, 3].map(p => `<h3>Fase ${p} · ${PHASES[p].weeks} · "${PHASES[p].name}"</h3><ul class="dots small">${PHASES[p].bullets.map(b => `<li>${esc(b)}</li>`).join('')}</ul>`).join('')}
+    ${[1, 2, 3].map(p => `<h3>Fase ${p} · ${PHASES[p].weeks} · "${PHASES[p].name}"</h3><ul class="dots small">${bulletsFase(p).map(b => `<li>${esc(b)}</li>`).join('')}</ul>`).join('')}
     <h3>Reglas para avanzar</h3><ul class="dots small"><li>2 semanas seguidas cumpliendo la meta semanal, y</li><li>dolor promedio antes de entrenar ≤2, y</li><li>el dolor no sube más de 2 puntos durante las sesiones.</li><li>Si el dolor promedio de la última semana es ≥4, la app sugiere volver a la fase anterior.</li></ul></div>`;
   h += `<div class="card"><h2>📖 Guía de ejercicios</h2><p class="muted small">Toca un ejercicio para ver cómo se hace, los errores comunes y un video.</p>
-    ${GROUPS.map(g => { const es = allEx().filter(e => e.group === g); return es.length ? `<h3>${esc(g)}</h3>${es.map(e => `<button class="lib-item" data-act="guide-open" data-id="${esc(e.id)}"><span class="grow"><b>${esc(e.name)}</b></span>${shoulderBadge(e)}<span class="muted">›</span></button>`).join('')}` : ''; }).join('')}</div>`;
+    ${GROUPS.filter(g => g !== 'Rehab hombro' || tieneHombro()).map(g => { const es = allEx().filter(e => e.group === g); return es.length ? `<h3>${esc(g)}</h3>${es.map(e => `<button class="lib-item" data-act="guide-open" data-id="${esc(e.id)}"><span class="grow"><b>${esc(e.name)}</b></span>${shoulderBadge(e)}<span class="muted">›</span></button>`).join('')}` : ''; }).join('')}</div>`;
   h += `<div class="card"><div class="row between"><h2 class="mb0">Mis plantillas</h2><button class="btn sm" data-act="tpl-new">+ Nueva</button></div>
     <div class="mt">${typeof importButton === 'function' ? importButton() : ''}</div>
     ${S.templates.length ? `<div class="mt">${S.templates.map(t => `<div class="list-row"><span class="grow"><b>${esc(t.name)}</b><div class="tiny muted">${plural(t.items.length, 'ejercicio', 'ejercicios')}</div></span><button class="btn sm" data-act="tpl-edit" data-id="${t.id}">Editar</button><button class="btn sm danger icon" data-act="tpl-del" data-id="${t.id}" aria-label="Borrar plantilla">✕</button></div>`).join('')}</div>` : '<p class="muted small">Aún no tienes plantillas propias. Puedes crearlas aquí o guardar una sesión como plantilla.</p>'}</div>`;
