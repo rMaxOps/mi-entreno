@@ -8,7 +8,9 @@ import { render } from '../ui/render.js';
 import { toast } from '../ui/toast.js';
 import { clamp, esc } from '../util.js';
 import { nube } from './cliente.js';
-import { SYNC, cuentaTieneDatos, meta, perfil, sincronizar } from './sync.js';
+import { SYNC, cuentaTieneDatos, meta, sincronizar } from './sync.js';
+import { onboardingPendiente, perfil } from '../logica/perfil.js';
+import { iniciarOnboarding } from '../vistas/perfil.js';
 
 const MARCA = 'mientreno.sesion';   // última cuenta usada en este teléfono (para abrir sin internet)
 export const CUENTA = { email: null, sinSesion: false, enviado: null };
@@ -35,7 +37,7 @@ async function alCambiarSesion(evento, ses) {
     const nueva = CUENTA_UID !== uid;
     CUENTA.email = email; CUENTA.sinSesion = false; CUENTA.enviado = null;
     localStorage.setItem(MARCA, JSON.stringify({ uid, email }));
-    if (nueva) { usarAlmacen(uid); UI.enter = true; render(); }
+    if (nueva) { if (UI.pf && UI.pf.modo === 'onb') UI.pf = null; usarAlmacen(uid); UI.enter = true; render(); }
     if (evento === 'SIGNED_IN' && nueva) toast(t('cuenta.hola', { email }), 'ok');
     await sincronizar();
     await revisarConsentimiento(uid);
@@ -58,6 +60,7 @@ async function revisarConsentimiento(uid) {
   let enNube = false;
   try { enNube = await cuentaTieneDatos(); } catch (e) { /* sin red: decide con lo local */ }
   if (n > 0 && !yaImportado && !enNube && !S.sessions.length) abrirImportacion();
+  else if (onboardingPendiente() && !S.sessions.length) { iniciarOnboarding(); UI.enter = true; render(); }  // incluye el consentimiento
   else if (!perfil().consent_at) abrirConsentimiento();
 }
 const $modalAbierto = () => !!document.querySelector('#modal-root .sheet');
@@ -140,7 +143,7 @@ ACT['mig-ok'] = async () => {
   if (!m.sinMolestias) { nuevo.settings.side = m.side; nuevo.settings.threshold = m.threshold; }
   if (m.equip.includes('mancuernas') && pesos.length) nuevo.settings.weights = pesos;
   nuevo.profile = {
-    level: m.level, goal: m.goal, coach: 'coach', display_name: null, consent_at: new Date().toISOString(), onboarded_at: null,
+    level: m.level, goal: m.goal, coach: 'coach', display_name: null, consent_at: new Date().toISOString(), onboarded_at: new Date().toISOString(),
     conditions: m.sinMolestias ? [] : [{ id: crypto.randomUUID(), zone: m.zone, side: m.side, status: m.status, since: null, notes: '',
       bothers: m.bothers, threshold: m.threshold }],
     equipment: m.equip.map(k => ({ id: crypto.randomUUID(), kind: k, weights: k === 'mancuernas' ? pesos : [] })),
@@ -166,22 +169,24 @@ export function estadoSync() {
   const min = Math.round((Date.now() - SYNC.ultimo) / 60000);
   return t('sync.al_dia', { hace: min < 1 ? 'recién' : `hace ${min} min` });
 }
-export function cuentaCard() {
-  if (!CUENTA_UID) {
-    return `<div class="card"><h2>${t('cuenta.titulo')}</h2><p class="muted small">${t('cuenta.invitado')}</p>
-      <button class="btn pri big" data-act="cta-google">${t('cuenta.google')}</button>
+/* Botones para entrar (Google, enlace por correo y código). Se usan en Más y en la bienvenida. */
+export function loginBotones() {
+  return `<button class="btn pri big" data-act="cta-google">${t('cuenta.google')}</button>
       <p class="center tiny muted mt">${t('cuenta.o_correo')}</p>
       <div class="row"><input class="inp grow" id="cta-email" type="email" autocomplete="email" inputmode="email" placeholder="${t('cuenta.correo_ph')}" value="${esc(CUENTA.enviado || '')}"><button class="btn" data-act="cta-email">${t('cuenta.enviar_enlace')}</button></div>
       ${CUENTA.enviado ? `<div class="note info small">${t('cuenta.enviado', { email: esc(CUENTA.enviado) })}</div>
         <p class="small muted">${t('cuenta.codigo_ayuda')}</p>
         <div class="row"><input class="inp grow" id="cta-codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="${t('cuenta.codigo_ph')}"><button class="btn" data-act="cta-codigo">${t('cuenta.entrar_codigo')}</button></div>` : ''}
-      <p class="tiny muted mt">${t('cuenta.solo_invitados')}</p></div>`;
-  }
+      <p class="tiny muted mt">${t('cuenta.solo_invitados')}</p>`;
+}
+export function cuentaCard() {
+  if (!CUENTA_UID) return `<div class="card"><h2>${t('cuenta.titulo')}</h2><p class="muted small">${t('cuenta.invitado')}</p>${loginBotones()}</div>`;
   const { n, g } = datosInvitado();
   const puedeImportar = n > 0 && !(g.ui.importedTo || []).includes(CUENTA_UID);
   return `<div class="card"><h2>${t('cuenta.titulo')}</h2>
     <p class="small"><b>${t('cuenta.conectado', { email: esc(CUENTA.email || '') })}</b></p>
     ${CUENTA.sinSesion ? `<div class="note warn small">${t('cuenta.sin_sesion')}</div><button class="btn pri block" data-act="cta-google">${t('cuenta.google')}</button>` : ''}
+    ${perfil().consent_at ? '' : `<div class="note warn small">${t('cuenta.falta_consentimiento')}</div><button class="btn pri block" data-act="cons-abrir">${t('consentimiento.seguir')}</button>`}
     <p class="small muted" id="sync-estado">${estadoSync()}</p>
     <div class="row wrap"><button class="btn grow" data-act="cta-sync">${t('cuenta.sincronizar')}</button><button class="btn grow danger" data-act="cta-salir">${t('cuenta.salir')}</button></div>
     ${puedeImportar ? `<button class="btn block mt" data-act="cta-importar">${t('cuenta.importar')}</button>` : ''}</div>`;
@@ -228,6 +233,7 @@ ACT['cta-sync'] = async () => {
   toast(ok ? estadoSync() : (navigator.onLine ? t('sync.error') : t('sync.sin_red')), ok ? 'ok' : '');
 };
 ACT['cta-importar'] = () => abrirImportacion();
+ACT['cons-abrir'] = () => abrirConsentimiento();
 ACT['cta-salir'] = async () => {
   await sincronizar();
   const n = Object.keys(meta().pend).length;

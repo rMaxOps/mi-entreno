@@ -5,8 +5,9 @@ Se usa en el celular antes y durante cada sesión.
 Responde y escribe la interfaz siempre en **español de Chile**.
 
 ## Quién la usa
-- **Es multiusuario, pero privada:** la usan solo 5 personas de la misma familia (yo, mi novia, sus
-  hermanas y mi mamá). El registro abierto está cerrado: solo entra quien yo invito.
+- **Es multiusuario, pero privada.** **Por ahora la uso solo yo**; más adelante quizás mi familia (mi novia,
+  sus hermanas y mi mamá). El registro abierto está cerrado: solo entra quien yo invito, y en Google solo
+  está mi Gmail como usuario de prueba. No invites ni agregues a nadie sin que yo lo pida.
 - Cada persona tiene su perfil: molestias o lesiones (zona, lado, estado, umbral de dolor,
   movimientos que molestan), equipo disponible, nivel, objetivo y días por semana.
   La app se adapta a eso: ejercicios, avisos, check-in y rutinas.

@@ -1,4 +1,6 @@
 /* Pantalla Inicio. */
+import { t } from '../i18n.js';
+import { onboardingPendiente, tieneDatos, zonaDolor } from '../logica/perfil.js';
 import { PHASES, RULES } from '../datos/catalogo.js';
 import { S } from '../estado.js';
 import { getTpl, preOf, sessions, setsOf } from '../logica/ejercicios.js';
@@ -11,7 +13,8 @@ export function vInicio() {
   let h = '';
   if (S.draft) h += `<div class="card hl"><div class="row"><div class="grow"><b>Entreno en curso</b><div class="muted small">${esc(S.draft.tplName)} · <span data-chrono></span></div></div><button class="btn pri" data-act="tab" data-tab="entreno">Continuar</button></div></div>`;
   const pend = pendingNextDay();
-  if (pend) h += `<div class="card y"><h2>¿Cómo amaneció el hombro?</h2><p class="muted small">Ayer hiciste ${esc(pend.tplName)}. Antes de entrenar: ${preOf(pend)}/10.</p><button class="btn pri block" data-act="nd-open" data-id="${pend.id}">Responder</button></div>`;
+  if (onboardingPendiente() && tieneDatos()) h += `<div class="card hl"><h2>${t('perfil.completar')}</h2><p class="small muted">${t('perfil.completar_texto')}</p><button class="btn pri block" data-act="pf-abrir">${t('perfil.editar')}</button></div>`;
+  if (pend) h += `<div class="card y"><h2>${(zonaDolor() ? t('perfil.como_amanecio', { zona: zonaDolor() }) : t('perfil.como_amanecio_general'))}</h2><p class="muted small">Ayer hiciste ${esc(pend.tplName)}. Antes de entrenar: ${preOf(pend)}/10.</p><button class="btn pri block" data-act="nd-open" data-id="${pend.id}">Responder</button></div>`;
   if ((pc.up || pc.down) && Date.now() > (S.ui.phaseSnooze || 0)) {
     h += pc.down
       ? `<div class="card r"><h2>Sugerencia: volver a la Fase ${st.phase - 1}</h2><p class="small">Tu dolor promedio antes de entrenar en la última semana es ${n1(pc.avg7)}/10 (4 o más). Conviene bajar un escalón por un tiempo.</p><div class="row"><button class="btn danger grow" data-act="phase-set" data-p="${st.phase - 1}">Volver a Fase ${st.phase - 1}</button><button class="btn ghost" data-act="phase-snooze">Ahora no</button></div></div>`
@@ -38,7 +41,7 @@ export function vInicio() {
     <div class="stat"><b class="${ap == null ? '' : 'p-' + pLevel(ap)}">${ap == null ? '—' : n1(ap)}</b><span>dolor promedio (últ. 5, antes)</span></div>
     <div class="stat"><b>${streak()}</b><span>semanas seguidas con la meta</span></div></div>`;
   const last = ss.slice(-10);
-  h += `<div class="card"><h2>Dolor de hombro</h2>${last.length ? lineChart({
+  h += `<div class="card"><h2>${(zonaDolor() ? t('perfil.dolor_grafico', { zona: zonaDolor() }) : t('perfil.dolor_grafico_general'))}</h2>${last.length ? lineChart({
       labels: last.map(s => sd(s.start)), yMin: 0, yMax: 10, label: 'Dolor antes, después y al día siguiente',
       series: [{ name: 'Antes', color: 'var(--c1)', values: last.map(preOf) }, { name: 'Después', color: 'var(--c2)', values: last.map(s => s.painEnd ?? null) }, { name: 'Día sig.', color: 'var(--c3)', dash: true, values: last.map(s => s.nextDay ? s.nextDay.pain : null) }] })
       + `<div class="legend"><span><i style="background:var(--c1)"></i>Antes</span><span><i style="background:var(--c2)"></i>Después</span><span style="color:var(--c3)"><i class="dash"></i><span style="color:var(--mu)">Día siguiente</span></span></div>`
